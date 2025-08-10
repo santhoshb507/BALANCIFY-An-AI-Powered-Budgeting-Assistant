@@ -464,50 +464,91 @@ const WhatIfSimulator: React.FC<WhatIfSimulatorProps> = ({
           {/* Individual Goal Progress Charts */}
           {initialData?.financialGoals && initialData.financialGoals.length > 0 && (
             <div className="space-y-6">
-              <h3 className="font-orbitron text-xl text-cosmic-gradient mb-4">Individual Goal Progress</h3>
-              {initialData.financialGoals.map((goal, index) => (
-                <Card key={goal.id || index} className="cosmic-card">
-                  <CardHeader>
-                    <CardTitle className="text-lg text-neon-cyan flex items-center gap-2">
-                      <Target className="w-5 h-5" />
-                      Goal {index + 1}: {goal.description}
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <GoalTimelineChart
-                      data={simulationResult.projections.goalTimeline.map((item, i) => ({
-                        ...item,
-                        goalTarget: goal.targetAmount
-                      }))}
-                      goalName={goal.description}
-                      targetAmount={goal.targetAmount}
-                      currentAmount={goal.currentAmount || 0}
-                      monthlyContribution={calculatePotentialSavings() / initialData.financialGoals.length}
-                      actualSavings={actualCurrentSavings / initialData.financialGoals.length}
-                      projectedDate={`${new Date().getFullYear() + Math.ceil(goal.targetAmount / (calculatePotentialSavings() / initialData.financialGoals.length) / 12)}-12-31`}
-                    />
-                  </CardContent>
-                </Card>
-              ))}
+              <h3 className="font-orbitron text-xl text-cosmic-gradient mb-4">Individual Goal Analysis</h3>
+              {initialData.financialGoals.map((goal, index) => {
+                const currentTimeToGoal = Math.ceil(goal.targetAmount / (actualCurrentSavings / initialData.financialGoals.length || 1000));
+                const optimizedTimeToGoal = Math.ceil(goal.targetAmount / (calculatePotentialSavings() / initialData.financialGoals.length || 1000));
+                
+                return (
+                  <Card key={goal.id || index} className="cosmic-card">
+                    <CardHeader>
+                      <CardTitle className="text-lg text-neon-cyan flex items-center gap-2">
+                        <Target className="w-5 h-5" />
+                        Goal {index + 1}: {goal.description}
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                        <div className="text-center p-4 bg-slate-800/50 rounded-lg">
+                          <div className="text-xs text-gray-400 mb-1">Target Amount</div>
+                          <div className="font-mono text-lg text-stellar-gold">₹{goal.targetAmount.toLocaleString()}</div>
+                        </div>
+                        <div className="text-center p-4 bg-slate-800/50 rounded-lg">
+                          <div className="text-xs text-gray-400 mb-1">Time to Goal</div>
+                          <div className="font-mono text-lg text-neon-cyan">{currentTimeToGoal} months</div>
+                        </div>
+                        <div className="text-center p-4 bg-slate-800/50 rounded-lg">
+                          <div className="text-xs text-gray-400 mb-1">Optimized Time</div>
+                          <div className="font-mono text-lg text-aurora-green">{optimizedTimeToGoal} months</div>
+                        </div>
+                        <div className="text-center p-4 bg-slate-800/50 rounded-lg">
+                          <div className="text-xs text-gray-400 mb-1">Time Saved</div>
+                          <div className="font-mono text-lg text-cosmic-purple">{Math.max(0, currentTimeToGoal - optimizedTimeToGoal)} months</div>
+                        </div>
+                      </div>
+                      <GoalTimelineChart
+                        data={simulationResult.projections.goalTimeline.map((item, i) => ({
+                          ...item,
+                          goalTarget: goal.targetAmount
+                        }))}
+                        goalName={goal.description}
+                        targetAmount={goal.targetAmount}
+                        currentAmount={0}
+                        monthlyContribution={calculatePotentialSavings() / initialData.financialGoals.length}
+                        actualSavings={actualCurrentSavings / initialData.financialGoals.length}
+                        projectedDate={`${new Date().getFullYear() + optimizedTimeToGoal / 12}-12-31`}
+                      />
+                    </CardContent>
+                  </Card>
+                );
+              })}
             </div>
           )}
 
-          {/* Overall Combined Goals Timeline */}
+          {/* Overall Goals Achievement Timeline */}
           {initialData?.financialGoals && initialData.financialGoals.length > 1 && (
             <Card className="cosmic-card">
               <CardHeader>
                 <CardTitle className="font-orbitron text-xl text-cosmic-gradient flex items-center gap-2">
                   <TrendingUp className="w-5 h-5 text-stellar-gold" />
-                  Combined Goals Timeline - Current vs Optimized
+                  Overall Goals Achievement Timeline
                 </CardTitle>
-                <p className="text-gray-400">All goals combined with optimized strategy</p>
+                <p className="text-gray-400">Combined analysis of all financial goals</p>
               </CardHeader>
               <CardContent>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                  <div className="text-center p-4 bg-slate-800/50 rounded-lg">
+                    <div className="text-xs text-gray-400 mb-1">Total Goals</div>
+                    <div className="font-mono text-lg text-neon-cyan">{initialData.financialGoals.length}</div>
+                  </div>
+                  <div className="text-center p-4 bg-slate-800/50 rounded-lg">
+                    <div className="text-xs text-gray-400 mb-1">Total Target</div>
+                    <div className="font-mono text-lg text-stellar-gold">₹{initialData.financialGoals.reduce((sum, goal) => sum + goal.targetAmount, 0).toLocaleString()}</div>
+                  </div>
+                  <div className="text-center p-4 bg-slate-800/50 rounded-lg">
+                    <div className="text-xs text-gray-400 mb-1">Last Goal Monthly Savings</div>
+                    <div className="font-mono text-lg text-aurora-green">₹{Math.round(calculatePotentialSavings()).toLocaleString()}</div>
+                  </div>
+                  <div className="text-center p-4 bg-slate-800/50 rounded-lg">
+                    <div className="text-xs text-gray-400 mb-1">Optimized Time to Goal</div>
+                    <div className="font-mono text-lg text-cosmic-purple">{Math.ceil(initialData.financialGoals.reduce((sum, goal) => sum + goal.targetAmount, 0) / calculatePotentialSavings())} months</div>
+                  </div>
+                </div>
                 <GoalTimelineChart
                   data={simulationResult.projections.goalTimeline}
                   goalName="All Financial Goals Combined"
                   targetAmount={initialData.financialGoals.reduce((sum, goal) => sum + goal.targetAmount, 0)}
-                  currentAmount={initialData.financialGoals.reduce((sum, goal) => sum + (goal.currentAmount || 0), 0)}
+                  currentAmount={0}
                   monthlyContribution={calculatePotentialSavings()}
                   actualSavings={actualCurrentSavings}
                   projectedDate={`${new Date().getFullYear() + Math.ceil(initialData.financialGoals.reduce((sum, goal) => sum + goal.targetAmount, 0) / calculatePotentialSavings() / 12)}-12-31`}

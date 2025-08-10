@@ -236,19 +236,7 @@ export function DashboardPage({ analysisResult, onStartNew, onBackToHome }: Dash
             </div>
           )}
 
-          {/* What-If Simulator */}
-          <div className="mb-8">
-            <WhatIfSimulator
-              questionnaireId={analysisResult.questionnaireId}
-              initialData={{
-                income: { monthly: totalExpenses + analysisResult.spendingBreakdown.savings + analysisResult.spendingBreakdown.investments },
-                expenses: { total: totalExpenses },
-                currentSavings: analysisResult.goalTimeline.currentSavings,
-                financialGoals: analysisResult.financialGoals || [{ targetAmount: analysisResult.goalTimeline.targetAmount, description: "Primary Goal" }],
-                spendingBreakdown: analysisResult.spendingBreakdown
-              }}
-            />
-          </div>
+
 
           {/* Individual Goal Analysis */}
           {analysisResult.financialGoals && analysisResult.financialGoals.length > 0 && (
