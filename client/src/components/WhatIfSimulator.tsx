@@ -547,15 +547,33 @@ const WhatIfSimulator: React.FC<WhatIfSimulatorProps> = ({
               <h3 className="font-orbitron text-xl text-cosmic-gradient mb-4">Individual Goal Analysis</h3>
               {initialData.financialGoals.map((goal: any, index: number) => {
                 // Calculate remaining amount needed for this goal
-                const remainingAmount = goal.targetAmount - (goal.currentAmount || 0);
+                const remainingAmount = Math.max(0, goal.targetAmount - (goal.currentAmount || 0));
                 
                 // Calculate monthly savings allocated to this goal (divide total savings by number of goals)
                 const currentMonthlySavingsPerGoal = actualCurrentSavings / initialData.financialGoals.length;
                 const optimizedMonthlySavingsPerGoal = calculatePotentialSavings() / initialData.financialGoals.length;
                 
                 // Calculate time to goal based on remaining amount and monthly allocation
-                const currentTimeToGoal = Math.ceil(remainingAmount / Math.max(currentMonthlySavingsPerGoal, 1000));
-                const optimizedTimeToGoal = Math.ceil(remainingAmount / Math.max(optimizedMonthlySavingsPerGoal, 1000));
+                // Only use fallback if monthly savings is 0 or negative
+                const currentTimeToGoal = currentMonthlySavingsPerGoal <= 0 
+                  ? 999 
+                  : Math.ceil(remainingAmount / currentMonthlySavingsPerGoal);
+                const optimizedTimeToGoal = optimizedMonthlySavingsPerGoal <= 0 
+                  ? 999 
+                  : Math.ceil(remainingAmount / optimizedMonthlySavingsPerGoal);
+                
+                // Debug logging
+                console.log(`Goal ${index + 1} (${goal.description}):`, {
+                  targetAmount: goal.targetAmount,
+                  currentAmount: goal.currentAmount || 0,
+                  remainingAmount,
+                  currentMonthlySavingsPerGoal,
+                  optimizedMonthlySavingsPerGoal,
+                  currentTimeToGoal,
+                  optimizedTimeToGoal,
+                  actualCurrentSavings,
+                  potentialSavings: calculatePotentialSavings()
+                });
                 
                 return (
                   <Card key={goal.id || index} className="cosmic-card">
@@ -577,15 +595,23 @@ const WhatIfSimulator: React.FC<WhatIfSimulatorProps> = ({
                         </div>
                         <div className="text-center p-4 bg-slate-800/50 rounded-lg">
                           <div className="text-xs text-gray-400 mb-1">Time to Goal</div>
-                          <div className="font-mono text-lg text-neon-cyan">{currentTimeToGoal} months</div>
+                          <div className="font-mono text-lg text-neon-cyan">
+                            {currentTimeToGoal >= 999 ? '∞' : `${currentTimeToGoal} months`}
+                          </div>
                         </div>
                         <div className="text-center p-4 bg-slate-800/50 rounded-lg">
                           <div className="text-xs text-gray-400 mb-1">Optimized Time</div>
-                          <div className="font-mono text-lg text-aurora-green">{optimizedTimeToGoal} months</div>
+                          <div className="font-mono text-lg text-aurora-green">
+                            {optimizedTimeToGoal >= 999 ? '∞' : `${optimizedTimeToGoal} months`}
+                          </div>
                         </div>
                         <div className="text-center p-4 bg-slate-800/50 rounded-lg">
                           <div className="text-xs text-gray-400 mb-1">Time Saved</div>
-                          <div className="font-mono text-lg text-cosmic-purple">{Math.max(0, currentTimeToGoal - optimizedTimeToGoal)} months</div>
+                          <div className="font-mono text-lg text-cosmic-purple">
+                            {(currentTimeToGoal >= 999 || optimizedTimeToGoal >= 999) 
+                              ? 'N/A' 
+                              : `${Math.max(0, currentTimeToGoal - optimizedTimeToGoal)} months`}
+                          </div>
                         </div>
                       </div>
                       <GoalTimelineChart
