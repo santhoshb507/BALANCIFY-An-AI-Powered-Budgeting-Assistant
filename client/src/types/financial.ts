@@ -57,6 +57,7 @@ export interface FinancialData {
   investment_types: string[];
   monthly_investment: number;
   financial_goals: string;
+  parsed_financial_goals?: FinancialGoal[];
   
   // Budgeting Behavior & Mindset
   track_spending: "Yes" | "No";
@@ -68,6 +69,16 @@ export interface FinancialData {
   expense_reduction: number;
   preferred_savings: number;
   financial_discipline: number;
+}
+
+export interface FinancialGoal {
+  id: string;
+  description: string;
+  targetAmount: number;
+  currentAmount: number;
+  targetDate?: string;
+  priority: 'high' | 'medium' | 'low';
+  category: 'emergency' | 'investment' | 'purchase' | 'retirement' | 'education' | 'other';
 }
 
 export interface AnalysisResult {
@@ -116,6 +127,7 @@ export interface AnalysisResult {
       description: string;
     }[];
   };
+  financialGoals: FinancialGoal[];
 }
 
 export interface SimulationAdjustments {

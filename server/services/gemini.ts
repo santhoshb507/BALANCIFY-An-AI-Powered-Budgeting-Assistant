@@ -51,6 +51,16 @@ export interface Recommendations {
   investmentStrategy: string;
 }
 
+export interface FinancialGoal {
+  id: string;
+  description: string;
+  targetAmount: number;
+  currentAmount: number;
+  targetDate?: string;
+  priority: 'high' | 'medium' | 'low';
+  category: 'emergency' | 'investment' | 'purchase' | 'retirement' | 'education' | 'other';
+}
+
 export interface GoalTimeline {
   currentSavings: number;
   targetAmount: number;
@@ -69,6 +79,7 @@ export async function analyzeFinancialData(data: QuestionnaireData): Promise<{
   needsWantsAnalysis: NeedsWantsAnalysis;
   recommendations: Recommendations;
   goalTimeline: GoalTimeline;
+  financialGoals: FinancialGoal[];
 }> {
   try {
     // Calculate spending breakdown
@@ -83,6 +94,9 @@ export async function analyzeFinancialData(data: QuestionnaireData): Promise<{
     // Generate AI insights
     const insights = await generateAIInsights(data, spendingBreakdown, needsWantsAnalysis);
     
+    // Parse financial goals from text input
+    const financialGoals = parseFinancialGoals(data.financial_goals, data.monthly_income);
+    
     // Generate recommendations
     const recommendations = await generateRecommendations(data, spendingBreakdown, needsWantsAnalysis);
     
@@ -92,6 +106,7 @@ export async function analyzeFinancialData(data: QuestionnaireData): Promise<{
       needsWantsAnalysis,
       recommendations,
       goalTimeline,
+      financialGoals,
     };
   } catch (error) {
     throw new Error(`Failed to analyze financial data: ${error}`);
@@ -160,6 +175,64 @@ function analyzeNeedsVsWants(data: QuestionnaireData, spending: SpendingBreakdow
     needsPercentage: Math.round((totalNeeds / totalSpending) * 100),
     wantsPercentage: Math.round((totalWants / totalSpending) * 100),
   };
+}
+
+function parseFinancialGoals(financialGoalsText: string, monthlyIncome: number): FinancialGoal[] {
+  if (!financialGoalsText || financialGoalsText.trim() === '') {
+    return [];
+  }
+
+  const goals: FinancialGoal[] = [];
+  const goalTexts = financialGoalsText.split(/[,;]\s*|\n/).filter(text => text.trim());
+
+  goalTexts.forEach((goalText, index) => {
+    const text = goalText.trim().toLowerCase();
+    
+    // Extract amount using regex
+    const amountMatch = text.match(/(?:₹|rs\.?|rupees?)\s*(\d+(?:,\d+)*(?:\.\d+)?)\s*(?:lakhs?|lacs?|l|k|thousands?)?/i) || 
+                       text.match(/(\d+(?:,\d+)*(?:\.\d+)?)\s*(?:lakhs?|lacs?|l|k|thousands?|₹|rs\.?)/i);
+    
+    let targetAmount = 500000; // Default target
+    if (amountMatch) {
+      const numStr = amountMatch[1].replace(/,/g, '');
+      let amount = parseFloat(numStr);
+      
+      // Check for units
+      if (text.includes('lakh') || text.includes('lac') || text.includes(' l ')) {
+        amount *= 100000;
+      } else if (text.includes('k') || text.includes('thousand')) {
+        amount *= 1000;
+      } else if (text.includes('crore')) {
+        amount *= 10000000;
+      }
+      
+      targetAmount = amount;
+    }
+
+    // Determine category based on keywords
+    let category: FinancialGoal['category'] = 'other';
+    if (text.includes('emergency') || text.includes('fund')) category = 'emergency';
+    else if (text.includes('house') || text.includes('car') || text.includes('bike') || text.includes('purchase')) category = 'purchase';
+    else if (text.includes('retirement') || text.includes('pension')) category = 'retirement';
+    else if (text.includes('education') || text.includes('study')) category = 'education';
+    else if (text.includes('invest') || text.includes('portfolio')) category = 'investment';
+
+    // Determine priority based on category and amount
+    let priority: FinancialGoal['priority'] = 'medium';
+    if (category === 'emergency' || targetAmount > monthlyIncome * 60) priority = 'high';
+    else if (targetAmount < monthlyIncome * 12) priority = 'low';
+
+    goals.push({
+      id: `goal_${index + 1}`,
+      description: goalText.trim(),
+      targetAmount,
+      currentAmount: Math.floor(targetAmount * 0.1), // Assume 10% already saved
+      priority,
+      category
+    });
+  });
+
+  return goals;
 }
 
 function calculateGoalTimeline(data: QuestionnaireData, spending: SpendingBreakdown): GoalTimeline {
