@@ -110,11 +110,11 @@ const WhatIfSimulator: React.FC<WhatIfSimulatorProps> = ({
           simulation: params
         }),
       });
-
+      
       if (!response.ok) {
         throw new Error('Simulation failed');
       }
-
+      
       return response.json();
     },
     onSuccess: (data: any) => {
@@ -131,7 +131,7 @@ const WhatIfSimulator: React.FC<WhatIfSimulatorProps> = ({
           goalTimeline: data.projections?.goalTimeline || []
         }
       };
-
+      
       setSimulationResult(normalizedData);
       setIsSimulating(false);
     },
@@ -170,24 +170,24 @@ const WhatIfSimulator: React.FC<WhatIfSimulatorProps> = ({
   const calculatePotentialSavings = () => {
     const monthlyIncome = initialData?.income?.monthly || 0;
     const monthlyExpenses = initialData?.expenses?.total || 0;
-
+    
     const newIncome = monthlyIncome * (1 + simulationParams.incomeIncrease / 100);
     const newExpenses = monthlyExpenses * (1 - simulationParams.expenseReduction / 100);
     const additionalMonthlySavings = (simulationParams.additionalSavings / 100) * monthlyIncome;
-
+    
     return newIncome - newExpenses + additionalMonthlySavings;
   };
 
   useEffect(() => {
     // Auto-run simulation when parameters change significantly
-    const totalChange = simulationParams.incomeIncrease + simulationParams.expenseReduction +
+    const totalChange = simulationParams.incomeIncrease + simulationParams.expenseReduction + 
                        simulationParams.additionalSavings + simulationParams.investmentBoost;
-
+    
     if (totalChange > 0 && !simulationMutation.isPending) {
       const timer = setTimeout(() => {
         runSimulation();
       }, 1000);
-
+      
       return () => clearTimeout(timer);
     }
   }, [simulationParams]);
@@ -206,7 +206,7 @@ const WhatIfSimulator: React.FC<WhatIfSimulatorProps> = ({
             Explore how different financial decisions could impact your goals
           </p>
         </CardHeader>
-
+        
         <CardContent className="space-y-6">
           {/* Predefined Scenarios */}
           <div>
@@ -216,8 +216,8 @@ const WhatIfSimulator: React.FC<WhatIfSimulatorProps> = ({
                 <Card
                   key={scenario.id}
                   className={`cursor-pointer transition-all duration-300 hover:scale-105 ${
-                    selectedScenario === scenario.id
-                      ? 'border-neon-cyan bg-neon-cyan/10'
+                    selectedScenario === scenario.id 
+                      ? 'border-neon-cyan bg-neon-cyan/10' 
                       : 'border-slate-600 hover:border-neon-cyan/50'
                   }`}
                   onClick={() => applyScenario(scenario)}
@@ -360,7 +360,7 @@ const WhatIfSimulator: React.FC<WhatIfSimulatorProps> = ({
               )}
               Run Simulation
             </Button>
-
+            
             <Button
               onClick={resetSimulation}
               variant="outline"
@@ -384,47 +384,47 @@ const WhatIfSimulator: React.FC<WhatIfSimulatorProps> = ({
                 AI Analysis Results
               </CardTitle>
             </CardHeader>
-
+            
             <CardContent>
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <Card className="glass-effect border-white/20">
-                  <CardHeader>
-                    <CardTitle className="text-neon-cyan flex items-center">
-                      <TrendingUp className="mr-2" />
-                      Scenario Insights
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="p-4 bg-green-500/10 border border-green-500/20 rounded-lg">
-                      <h4 className="font-semibold text-green-400 mb-2">Goal Achievement</h4>
-                      <p className="text-gray-300">{simulationResult?.insights?.goalAchievability || 'Calculating...'}</p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-4">
+                  <div>
+                    <div className="bg-aurora-green/20 text-aurora-green border border-aurora-green px-2 py-1 rounded text-xs font-semibold mb-2 inline-block">
+                      Goal Achievability
                     </div>
-                    <div className="p-4 bg-blue-500/10 border border-blue-500/20 rounded-lg">
-                      <h4 className="font-semibold text-blue-400 mb-2">Timeline Impact</h4>
-                      <p className="text-gray-300">{simulationResult?.insights?.timeToGoal || 'Analyzing timeline...'}</p>
+                    <p className="text-gray-300 text-sm">{simulationResult.insights.goalAchievability || 'Analysis in progress...'}</p>
+                  </div>
+                  
+                  <div>
+                    <div className="bg-neon-cyan/20 text-neon-cyan border border-neon-cyan px-2 py-1 rounded text-xs font-semibold mb-2 inline-block">
+                      Timeline
                     </div>
-                    <div className="p-4 bg-purple-500/10 border border-purple-500/20 rounded-lg">
-                      <h4 className="font-semibold text-purple-400 mb-2">Savings Boost</h4>
-                      <p className="text-gray-300">{simulationResult?.insights?.savingsImpact || 'Calculating impact...'}</p>
+                    <p className="text-gray-300 text-sm">{simulationResult.insights.timeToGoal || 'Calculating timeline...'}</p>
+                  </div>
+                </div>
+                
+                <div className="space-y-4">
+                  <div>
+                    <div className="bg-cosmic-purple/20 text-cosmic-purple border border-cosmic-purple px-2 py-1 rounded text-xs font-semibold mb-2 inline-block">
+                      Savings Impact
                     </div>
-                  </CardContent>
-                </Card>
-
-                <Card className="glass-effect border-white/20">
-                  <CardHeader>
-                    <CardTitle className="text-neon-cyan">Quick Wins</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <ul className="space-y-2">
-                      {(simulationResult?.insights?.recommendations || ['Loading recommendations...']).map((rec, index) => (
-                        <li key={index} className="flex items-start">
-                          <Target className="w-4 h-4 text-green-400 mt-1 mr-2 flex-shrink-0" />
-                          <span className="text-gray-300">{rec}</span>
+                    <p className="text-gray-300 text-sm">{simulationResult.insights.savingsImpact || 'Analyzing impact...'}</p>
+                  </div>
+                  
+                  <div>
+                    <div className="bg-stellar-gold/20 text-stellar-gold border border-stellar-gold px-2 py-1 rounded text-xs font-semibold mb-2 inline-block">
+                      Recommendations
+                    </div>
+                    <ul className="space-y-1">
+                      {(simulationResult.insights.recommendations || ['Loading recommendations...']).map((rec, index) => (
+                        <li key={index} className="text-gray-300 text-sm flex items-start gap-2">
+                          <CheckCircle className="w-3 h-3 text-aurora-green mt-0.5 flex-shrink-0" />
+                          {rec}
                         </li>
                       ))}
                     </ul>
-                  </CardContent>
-                </Card>
+                  </div>
+                </div>
               </div>
             </CardContent>
           </Card>
