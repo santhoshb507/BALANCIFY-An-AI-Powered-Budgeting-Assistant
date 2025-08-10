@@ -58,21 +58,32 @@ const WhatIfSimulator: React.FC<WhatIfSimulatorProps> = ({
   initialData,
   className = ""
 }) => {
-  // Calculate actual current savings as income - total expenses (using actual user data)
-  const currentIncome = initialData?.income?.monthly || 0; // Use actual user income, no fallback
-  const totalExpenses = initialData?.expenses?.total || 0; // Use actual user expenses, no fallback
-  const actualCurrentSavings = Math.max(0, currentIncome - totalExpenses);
+  // Calculate actual current savings from spending breakdown (real user data)
+  const spendingBreakdown = initialData?.spendingBreakdown || {};
+  
+  // Calculate total expenses from actual spending categories (excluding savings)
+  const totalExpenses = (spendingBreakdown.housing || 0) + 
+                       (spendingBreakdown.food || 0) + 
+                       (spendingBreakdown.transportation || 0) + 
+                       (spendingBreakdown.entertainment || 0) + 
+                       (spendingBreakdown.shopping || 0) + 
+                       (spendingBreakdown.subscriptions || 0) + 
+                       (spendingBreakdown.loans || 0) + 
+                       (spendingBreakdown.investments || 0) + 
+                       (spendingBreakdown.other || 0);
+  
+  // Current income = total expenses + current savings
+  const currentSavings = spendingBreakdown.savings || 0;
+  const currentIncome = totalExpenses + currentSavings;
+  const actualCurrentSavings = currentSavings;
   
   // Debug logging to verify we're using real user data
-  console.log('WhatIf Simulator - Using Real User Data:', {
+  console.log('WhatIf Simulator - Calculated from Real Spending Data:', {
     currentIncome,
     totalExpenses, 
     actualCurrentSavings,
-    receivedData: {
-      income: initialData?.income,
-      expenses: initialData?.expenses,
-      spendingBreakdown: initialData?.spendingBreakdown
-    }
+    spendingBreakdown,
+    calculation: `Income (${currentIncome}) = Expenses (${totalExpenses}) + Savings (${currentSavings})`
   });
   
   const [simulationParams, setSimulationParams] = useState<SimulationParams>({
