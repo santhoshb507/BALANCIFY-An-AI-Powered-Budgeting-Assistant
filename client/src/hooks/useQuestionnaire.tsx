@@ -7,7 +7,7 @@ import { useSession } from './useSession';
 export function useQuestionnaire() {
   const [currentStep, setCurrentStep] = useState(0);
   const [formData, setFormData] = useState<Partial<FinancialData>>({});
-  const { session, saveQuestionnaireProgress, hasCompletedQuestionnaire, saveQuestionnaireData } = useSession();
+  const { session, saveQuestionnaireProgress, hasCompletedQuestionnaire, hasExistingSession, saveQuestionnaireData } = useSession();
 
   // Load saved progress on mount
   useEffect(() => {
