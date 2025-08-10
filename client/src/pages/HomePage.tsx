@@ -4,6 +4,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useSession } from '@/hooks/useSession';
 import { useToast } from '@/hooks/use-toast';
+import { debugSession, testSessionCreation } from '@/utils/debug-session';
 import { Rocket, Sparkles, Brain, TrendingUp, Shield, Zap, ChevronRight, Star, Globe, RefreshCw, Trash2 } from 'lucide-react';
 
 interface HomePageProps {
@@ -18,6 +19,7 @@ const HomePage: React.FC<HomePageProps> = ({ onStartMission }) => {
 
   useEffect(() => {
     setIsVisible(true);
+    debugSession(); // Debug session on page load
     const interval = setInterval(() => {
       setCurrentFeature((prev) => (prev + 1) % 3);
     }, 4000);
@@ -126,6 +128,18 @@ const HomePage: React.FC<HomePageProps> = ({ onStartMission }) => {
             <span className="text-neon-pink font-semibold"> personalized recommendations</span> 
             that adapt to your lifestyle.
           </p>
+
+          {/* Debug Section - Remove after testing */}
+          <div className="mb-4 p-4 bg-gray-800 rounded text-sm">
+            <p>Debug: hasActiveSession() = {String(hasActiveSession())}</p>
+            <p>Debug: session = {JSON.stringify(session || {})}</p>
+            <Button onClick={() => testSessionCreation('TestUser')} className="mt-2 mr-2" size="sm">
+              Create Test Session
+            </Button>
+            <Button onClick={debugSession} className="mt-2" size="sm" variant="outline">
+              Debug Session
+            </Button>
+          </div>
 
           {/* Session Recovery Section */}
           {hasActiveSession() && (

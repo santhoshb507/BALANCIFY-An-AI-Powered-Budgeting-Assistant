@@ -71,7 +71,7 @@ const questions: Question[] = [
     fields: [
       { type: "checkbox", label: "Investment Types", id: "investment_types", options: ["Fixed Deposits", "Stocks", "Mutual Funds", "Crypto", "Gold"] },
       { type: "number", label: "Monthly Investment Amount (₹)", id: "monthly_investment", placeholder: "5000" },
-      { type: "goal-builder", label: "Financial Goals", id: "financial_goals" }
+      { type: "textarea", label: "Financial Goals", id: "financial_goals" }
     ]
   },
   {
@@ -98,7 +98,7 @@ interface QuestionnairePageProps {
 }
 
 export function QuestionnairePage({ onComplete }: QuestionnairePageProps) {
-  const { session, createSession, updateSession, hasActiveSession } = useSession();
+  const { session, createSession, hasActiveSession } = useSession();
   const { toast } = useToast();
   const {
     currentStep,
@@ -107,7 +107,6 @@ export function QuestionnairePage({ onComplete }: QuestionnairePageProps) {
     nextStep,
     prevStep,
     submitQuestionnaire,
-    loadFormDataFromSession,
     isSubmitting,
     analysisResult,
     error,
@@ -115,10 +114,10 @@ export function QuestionnairePage({ onComplete }: QuestionnairePageProps) {
 
   // Show session recovery notification on first render
   useEffect(() => {
-    if (hasActiveSession() && session?.formData) {
+    if (hasActiveSession() && session) {
       toast({
         title: "Session Restored",
-        description: `Welcome back! Your progress has been restored from step ${(session?.currentStep || 0) + 1}.`,
+        description: `Welcome back! Your progress has been restored from step ${(session.currentStep || 0) + 1}.`,
       });
     }
   }, []); // Only run once on mount
@@ -126,15 +125,18 @@ export function QuestionnairePage({ onComplete }: QuestionnairePageProps) {
   const currentQuestion = questions[currentStep];
   const progress = ((currentStep + 1) / questions.length) * 100;
 
-  // Simple form change handler without complex session logic
-  const handleFormChange = (newData: Partial<FinancialData>) => {
+  // Simple form change handler with session creation
+  const handleFormChange = (newData: any) => {
+    console.log('Form change detected:', newData);
     updateFormData(newData);
     
-    // Create/update session only when user enters a real name (length > 1)
-    if (newData.name && newData.name.length > 1) {
+    // Create session when user enters a name (length > 1)
+    if (newData.name && typeof newData.name === 'string' && newData.name.length > 1) {
       if (!session) {
+        console.log('Creating new session for:', newData.name);
         createSession(newData.name);
       } else if (session.userName !== newData.name) {
+        console.log('Updating session for new user:', newData.name);
         createSession(newData.name);
       }
     }
