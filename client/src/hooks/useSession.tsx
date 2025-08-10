@@ -8,6 +8,8 @@ interface SessionData {
   questionnaireCompleted: boolean;
   analysisResult?: any;
   formData?: any; // Store questionnaire progress
+  currentStep?: number; // Track questionnaire step
+  questionnaireData?: any; // Complete questionnaire responses
 }
 
 export function useSession() {
@@ -61,6 +63,36 @@ export function useSession() {
     }
   };
 
+  const saveQuestionnaireProgress = (formData: any, currentStep: number) => {
+    if (session) {
+      updateSession({ 
+        formData: formData,
+        currentStep: currentStep
+      });
+    }
+  };
+
+  const saveQuestionnaireData = (questionnaireData: any) => {
+    if (session) {
+      updateSession({ 
+        questionnaireData: questionnaireData,
+        questionnaireCompleted: true
+      });
+    }
+  };
+
+  const hasExistingSession = () => {
+    return session && session.isActive;
+  };
+
+  const hasCompletedQuestionnaire = () => {
+    return session && session.questionnaireCompleted && session.questionnaireData;
+  };
+
+  const hasAnalysisResult = () => {
+    return session && session.analysisResult;
+  };
+
   const completeSession = () => {
     if (session) {
       updateSession({ 
@@ -85,6 +117,11 @@ export function useSession() {
     updateSession,
     completeSession,
     endSession,
-    hasActiveSession
+    hasActiveSession,
+    saveQuestionnaireProgress,
+    saveQuestionnaireData,
+    hasExistingSession,
+    hasCompletedQuestionnaire,
+    hasAnalysisResult
   };
 }

@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { CosmicBackground } from '@/components/ui/cosmic-background';
@@ -28,8 +28,15 @@ interface DashboardPageProps {
 
 export function DashboardPage({ analysisResult, onStartNew, onBackToHome }: DashboardPageProps) {
   const { toast } = useToast();
-  const { session, endSession } = useSession();
+  const { session, endSession, updateSession } = useSession();
   const dashboardRef = useRef<HTMLDivElement>(null);
+
+  // Save analysis result to session when component mounts
+  useEffect(() => {
+    if (analysisResult && session) {
+      updateSession({ analysisResult });
+    }
+  }, [analysisResult, session, updateSession]);
 
   const handleEndSession = () => {
     endSession();
@@ -180,7 +187,12 @@ export function DashboardPage({ analysisResult, onStartNew, onBackToHome }: Dash
             <div className="flex gap-3">
               {onBackToHome && (
                 <Button
-                  onClick={onBackToHome}
+                  onClick={() => {
+                    // Maintain session when going back to home - session persists
+                    if (onBackToHome) {
+                      onBackToHome();
+                    }
+                  }}
                   variant="outline"
                   className="cosmic-button border-neon-cyan text-neon-cyan hover:bg-neon-cyan/10"
                 >

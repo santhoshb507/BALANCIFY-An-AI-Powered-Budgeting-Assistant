@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'wouter';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Rocket, Sparkles, Brain, TrendingUp, Shield, Zap, ChevronRight, Star, Globe } from 'lucide-react';
+import { Rocket, Sparkles, Brain, TrendingUp, Shield, Zap, ChevronRight, Star, Globe, Play, RotateCcw } from 'lucide-react';
+import { useSession } from '@/hooks/useSession';
 
 interface HomePageProps {
   onStartMission?: () => void;
@@ -11,6 +12,7 @@ interface HomePageProps {
 const HomePage: React.FC<HomePageProps> = ({ onStartMission }) => {
   const [currentFeature, setCurrentFeature] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
+  const { session, hasExistingSession, hasCompletedQuestionnaire, hasAnalysisResult, endSession } = useSession();
 
   useEffect(() => {
     setIsVisible(true);
@@ -103,24 +105,87 @@ const HomePage: React.FC<HomePageProps> = ({ onStartMission }) => {
             that adapt to your lifestyle.
           </p>
 
-          {/* CTA Buttons */}
+          {/* Session-Aware CTA Buttons */}
           <div className="flex flex-col sm:flex-row gap-6 justify-center mb-16">
-            <Button 
-              onClick={onStartMission}
-              className="cosmic-button px-10 py-4 text-lg font-semibold group relative overflow-hidden"
-            >
-              <Rocket className="w-6 h-6 mr-2 group-hover:rotate-12 transition-transform" />
-              Launch Financial Analysis
-              <ChevronRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
-            </Button>
-            <Button 
-              variant="outline" 
-              className="px-8 py-4 text-lg border-neon-cyan text-neon-cyan hover:bg-neon-cyan hover:text-slate-900 transition-all duration-300 backdrop-blur-sm"
-            >
-              <Globe className="w-5 h-5 mr-2" />
-              Explore Demo
-            </Button>
+            {hasAnalysisResult() ? (
+              // User has completed analysis, show direct access
+              <Button 
+                onClick={onStartMission}
+                className="cosmic-button px-10 py-4 text-lg font-semibold group relative overflow-hidden"
+              >
+                <Play className="w-6 h-6 mr-2 group-hover:scale-110 transition-transform" />
+                View Your Analysis
+                <ChevronRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
+              </Button>
+            ) : hasCompletedQuestionnaire() ? (
+              // User has completed questionnaire but no analysis yet
+              <Button 
+                onClick={onStartMission}
+                className="cosmic-button px-10 py-4 text-lg font-semibold group relative overflow-hidden"
+              >
+                <Brain className="w-6 h-6 mr-2 group-hover:pulse transition-transform" />
+                Generate Analysis
+                <ChevronRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
+              </Button>
+            ) : hasExistingSession() ? (
+              // User has started questionnaire but not completed
+              <Button 
+                onClick={onStartMission}
+                className="cosmic-button px-10 py-4 text-lg font-semibold group relative overflow-hidden"
+              >
+                <Play className="w-6 h-6 mr-2 group-hover:scale-110 transition-transform" />
+                Continue Questionnaire
+                <ChevronRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
+              </Button>
+            ) : (
+              // New user, start fresh
+              <Button 
+                onClick={onStartMission}
+                className="cosmic-button px-10 py-4 text-lg font-semibold group relative overflow-hidden"
+              >
+                <Rocket className="w-6 h-6 mr-2 group-hover:rotate-12 transition-transform" />
+                Launch Financial Analysis
+                <ChevronRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
+              </Button>
+            )}
+            
+            {/* Secondary button shows session status */}
+            {hasExistingSession() ? (
+              <Button 
+                onClick={() => endSession()}
+                variant="outline" 
+                className="px-8 py-4 text-lg border-red-400 text-red-400 hover:bg-red-400 hover:text-slate-900 transition-all duration-300 backdrop-blur-sm"
+              >
+                <RotateCcw className="w-5 h-5 mr-2" />
+                Start Fresh Session
+              </Button>
+            ) : (
+              <Button 
+                variant="outline" 
+                className="px-8 py-4 text-lg border-neon-cyan text-neon-cyan hover:bg-neon-cyan hover:text-slate-900 transition-all duration-300 backdrop-blur-sm"
+              >
+                <Globe className="w-5 h-5 mr-2" />
+                Explore Demo
+              </Button>
+            )}
           </div>
+
+          {/* Session Status Indicator */}
+          {hasExistingSession() && (
+            <div className="mb-8 p-4 rounded-lg bg-gradient-to-r from-cyan-900/20 to-purple-900/20 border border-cyan-400/30 backdrop-blur-sm">
+              <div className="flex items-center justify-center gap-2 text-cyan-300">
+                <div className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
+                <span className="text-sm font-medium">
+                  Welcome back, {session?.userName}! 
+                  {hasCompletedQuestionnaire() 
+                    ? " Your questionnaire is complete." 
+                    : hasAnalysisResult() 
+                    ? " Your analysis is ready."
+                    : " Continue where you left off."}
+                </span>
+              </div>
+            </div>
+          )}
 
           {/* Stats Grid */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-20">

@@ -1,11 +1,23 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
 import { FinancialData, AnalysisResult } from '@/types/financial';
+import { useSession } from './useSession';
 
 export function useQuestionnaire() {
   const [currentStep, setCurrentStep] = useState(0);
   const [formData, setFormData] = useState<Partial<FinancialData>>({});
+  const { session, saveQuestionnaireProgress, hasCompletedQuestionnaire, saveQuestionnaireData } = useSession();
+
+  // Load saved progress on mount
+  useEffect(() => {
+    if (session?.formData) {
+      setFormData(session.formData);
+    }
+    if (session?.currentStep !== undefined) {
+      setCurrentStep(session.currentStep);
+    }
+  }, [session]);
 
   const submitQuestionnaire = useMutation({
     mutationFn: async (data: FinancialData): Promise<AnalysisResult> => {
@@ -87,20 +99,40 @@ export function useQuestionnaire() {
         throw new Error(errorData.error || 'Failed to submit questionnaire');
       }
       
-      return response.json();
+      const result = await response.json();
+      // Save complete questionnaire data to session
+      if (saveQuestionnaireData) {
+        saveQuestionnaireData(sanitizedData);
+      }
+      return result;
     },
   });
 
   const updateFormData = (stepData: Partial<FinancialData>) => {
-    setFormData(prev => ({ ...prev, ...stepData }));
+    const updatedData = { ...formData, ...stepData };
+    setFormData(updatedData);
+    // Save progress to session
+    if (saveQuestionnaireProgress) {
+      saveQuestionnaireProgress(updatedData, currentStep);
+    }
   };
 
   const nextStep = () => {
-    setCurrentStep(prev => prev + 1);
+    const newStep = currentStep + 1;
+    setCurrentStep(newStep);
+    // Save progress to session
+    if (saveQuestionnaireProgress) {
+      saveQuestionnaireProgress(formData, newStep);
+    }
   };
 
   const prevStep = () => {
-    setCurrentStep(prev => Math.max(0, prev - 1));
+    const newStep = Math.max(0, currentStep - 1);
+    setCurrentStep(newStep);
+    // Save progress to session
+    if (saveQuestionnaireProgress) {
+      saveQuestionnaireProgress(formData, newStep);
+    }
   };
 
   const resetQuestionnaire = () => {
@@ -113,17 +145,28 @@ export function useQuestionnaire() {
     setFormData(prev => ({ ...prev, ...sessionData }));
   };
 
+  const goToStep = (step: number) => {
+    setCurrentStep(step);
+    // Save current step to session
+    if (saveQuestionnaireProgress) {
+      saveQuestionnaireProgress(formData, step);
+    }
+  };
+
   return {
     currentStep,
     formData,
     updateFormData,
     nextStep,
     prevStep,
+    goToStep,
     resetQuestionnaire,
     loadFormDataFromSession,
     submitQuestionnaire,
     isSubmitting: submitQuestionnaire.isPending,
     analysisResult: submitQuestionnaire.data,
     error: submitQuestionnaire.error,
+    hasCompletedQuestionnaire,
+    hasExistingSession,
   };
 }
