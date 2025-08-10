@@ -341,7 +341,6 @@ export function DashboardPage({ analysisResult, onStartNew, onBackToHome }: Dash
                   goalName={analysisResult.financialGoals?.[0]?.description || "Primary Financial Goal"}
                   targetAmount={analysisResult.goalTimeline.targetAmount}
                   currentAmount={analysisResult.goalTimeline.currentSavings}
-                  actualSavings={analysisResult.spendingBreakdown?.savings || 0}
                   projectedDate={`${new Date().getFullYear() + Math.ceil(analysisResult.goalTimeline.timeToGoal / 12)}-12-31`}
                 />
               </CardContent>
