@@ -1,5 +1,5 @@
 export interface QuestionField {
-  type: 'number' | 'text' | 'textarea' | 'radio' | 'checkbox' | 'select' | 'range';
+  type: 'number' | 'text' | 'textarea' | 'radio' | 'checkbox' | 'select' | 'range' | 'goal-builder';
   label: string;
   id: string;
   placeholder?: string;

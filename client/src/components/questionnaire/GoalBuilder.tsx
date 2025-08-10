@@ -4,6 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Textarea } from '@/components/ui/textarea';
 import { Plus, X, Target, Clock, Star } from 'lucide-react';
 
 interface FinancialGoal {
@@ -12,6 +13,7 @@ interface FinancialGoal {
   timeline_months: number;
   priority: "high" | "medium" | "low";
   category: "emergency" | "investment" | "purchase" | "retirement" | "education" | "other";
+  reasoning?: string;
 }
 
 interface GoalBuilderProps {
@@ -25,7 +27,8 @@ export function GoalBuilder({ value, onChange }: GoalBuilderProps) {
     target_amount: 500000,
     timeline_months: 24,
     priority: "high",
-    category: "emergency"
+    category: "emergency",
+    reasoning: ""
   }]);
 
   const addGoal = () => {
@@ -34,7 +37,8 @@ export function GoalBuilder({ value, onChange }: GoalBuilderProps) {
       target_amount: 100000,
       timeline_months: 12,
       priority: "medium",
-      category: "other"
+      category: "other",
+      reasoning: ""
     };
     const updatedGoals = [...goals, newGoal];
     setGoals(updatedGoals);
@@ -186,6 +190,17 @@ export function GoalBuilder({ value, onChange }: GoalBuilderProps) {
                   </SelectContent>
                 </Select>
               </div>
+            </div>
+
+            <div>
+              <Label className="text-gray-300 text-sm">Reason for choosing this goal</Label>
+              <Textarea
+                value={goal.reasoning || ""}
+                onChange={(e) => updateGoal(index, 'reasoning', e.target.value)}
+                placeholder="e.g., Need emergency fund for financial security, planning to buy a house in 2 years..."
+                className="bg-gray-800/50 border-gray-600 focus:border-neon-cyan text-white"
+                rows={2}
+              />
             </div>
           </CardContent>
         </Card>
