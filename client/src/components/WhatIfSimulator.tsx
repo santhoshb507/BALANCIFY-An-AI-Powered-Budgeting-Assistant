@@ -109,8 +109,22 @@ const WhatIfSimulator: React.FC<WhatIfSimulatorProps> = ({
       
       return response.json();
     },
-    onSuccess: (data: SimulationResult) => {
-      setSimulationResult(data);
+    onSuccess: (data: any) => {
+      // Ensure the data structure is complete with fallbacks
+      const normalizedData: SimulationResult = {
+        insights: {
+          goalAchievability: data.insights?.goalAchievability || 'Analysis in progress...',
+          timeToGoal: data.insights?.timeToGoal || 'Calculating timeline...',
+          savingsImpact: data.insights?.savingsImpact || 'Analyzing impact...',
+          recommendations: data.insights?.recommendations || ['Simulation data is being processed...']
+        },
+        projections: {
+          monthlyData: data.projections?.monthlyData || [],
+          goalTimeline: data.projections?.goalTimeline || []
+        }
+      };
+      
+      setSimulationResult(normalizedData);
       setIsSimulating(false);
     },
     onError: (error) => {
@@ -394,7 +408,7 @@ const WhatIfSimulator: React.FC<WhatIfSimulatorProps> = ({
                       Recommendations
                     </div>
                     <ul className="space-y-1">
-                      {(simulationResult.insights.recommendations || []).map((rec, index) => (
+                      {(simulationResult.insights.recommendations || ['Loading recommendations...']).map((rec, index) => (
                         <li key={index} className="text-gray-300 text-sm flex items-start gap-2">
                           <CheckCircle className="w-3 h-3 text-aurora-green mt-0.5 flex-shrink-0" />
                           {rec}
