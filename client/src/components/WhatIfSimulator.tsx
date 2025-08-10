@@ -68,7 +68,7 @@ const WhatIfSimulator: React.FC<WhatIfSimulatorProps> = ({
     expenseReduction: 0,
     additionalSavings: 0,
     investmentBoost: 0,
-    goalTarget: initialData?.financialGoals?.[0]?.targetAmount || 1000000
+    goalTarget: initialData?.financialGoals?.reduce((sum, goal) => sum + goal.targetAmount, 0) || 1000000
   });
 
   const [simulationResult, setSimulationResult] = useState<SimulationResult | null>(null);
@@ -453,20 +453,68 @@ const WhatIfSimulator: React.FC<WhatIfSimulatorProps> = ({
                   goalName="Current vs Optimized Progress"
                   targetAmount={simulationParams.goalTarget}
                   currentAmount={initialData?.currentSavings || 0}
-                  projectedDate={new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString()}
-              simulatedDate={simulationResult.insights?.timeToGoal || 'Calculating...'}
-              isSimulating={isSimulating}
+                  monthlyContribution={calculatePotentialSavings()}
+                  actualSavings={actualCurrentSavings}
+                  projectedDate={new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]}
                 />
               </CardContent>
             </Card>
           )}
 
-          {/* Transformation Analysis */}
-          <TransformationAnalysis
-            goals={initialData?.financialGoals || []}
-            currentMonthlySavings={actualCurrentSavings}
-            simulatedMonthlySavings={calculatePotentialSavings()}
-          />
+          {/* Individual Goal Progress Charts */}
+          {initialData?.financialGoals && initialData.financialGoals.length > 0 && (
+            <div className="space-y-6">
+              <h3 className="font-orbitron text-xl text-cosmic-gradient mb-4">Individual Goal Progress</h3>
+              {initialData.financialGoals.map((goal, index) => (
+                <Card key={goal.id || index} className="cosmic-card">
+                  <CardHeader>
+                    <CardTitle className="text-lg text-neon-cyan flex items-center gap-2">
+                      <Target className="w-5 h-5" />
+                      Goal {index + 1}: {goal.description}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <GoalTimelineChart
+                      data={simulationResult.projections.goalTimeline.map((item, i) => ({
+                        ...item,
+                        goalTarget: goal.targetAmount
+                      }))}
+                      goalName={goal.description}
+                      targetAmount={goal.targetAmount}
+                      currentAmount={goal.currentAmount || 0}
+                      monthlyContribution={calculatePotentialSavings() / initialData.financialGoals.length}
+                      actualSavings={actualCurrentSavings / initialData.financialGoals.length}
+                      projectedDate={`${new Date().getFullYear() + Math.ceil(goal.targetAmount / (calculatePotentialSavings() / initialData.financialGoals.length) / 12)}-12-31`}
+                    />
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
+
+          {/* Overall Combined Goals Timeline */}
+          {initialData?.financialGoals && initialData.financialGoals.length > 1 && (
+            <Card className="cosmic-card">
+              <CardHeader>
+                <CardTitle className="font-orbitron text-xl text-cosmic-gradient flex items-center gap-2">
+                  <TrendingUp className="w-5 h-5 text-stellar-gold" />
+                  Combined Goals Timeline - Current vs Optimized
+                </CardTitle>
+                <p className="text-gray-400">All goals combined with optimized strategy</p>
+              </CardHeader>
+              <CardContent>
+                <GoalTimelineChart
+                  data={simulationResult.projections.goalTimeline}
+                  goalName="All Financial Goals Combined"
+                  targetAmount={initialData.financialGoals.reduce((sum, goal) => sum + goal.targetAmount, 0)}
+                  currentAmount={initialData.financialGoals.reduce((sum, goal) => sum + (goal.currentAmount || 0), 0)}
+                  monthlyContribution={calculatePotentialSavings()}
+                  actualSavings={actualCurrentSavings}
+                  projectedDate={`${new Date().getFullYear() + Math.ceil(initialData.financialGoals.reduce((sum, goal) => sum + goal.targetAmount, 0) / calculatePotentialSavings() / 12)}-12-31`}
+                />
+              </CardContent>
+            </Card>
+          )}
         </div>
       )}
 
