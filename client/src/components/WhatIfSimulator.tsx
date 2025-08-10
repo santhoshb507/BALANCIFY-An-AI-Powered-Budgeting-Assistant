@@ -546,8 +546,16 @@ const WhatIfSimulator: React.FC<WhatIfSimulatorProps> = ({
             <div className="space-y-6">
               <h3 className="font-orbitron text-xl text-cosmic-gradient mb-4">Individual Goal Analysis</h3>
               {initialData.financialGoals.map((goal: any, index: number) => {
-                const currentTimeToGoal = Math.ceil(goal.targetAmount / (actualCurrentSavings / initialData.financialGoals.length || 1000));
-                const optimizedTimeToGoal = Math.ceil(goal.targetAmount / (calculatePotentialSavings() / initialData.financialGoals.length || 1000));
+                // Calculate remaining amount needed for this goal
+                const remainingAmount = goal.targetAmount - (goal.currentAmount || 0);
+                
+                // Calculate monthly savings allocated to this goal (divide total savings by number of goals)
+                const currentMonthlySavingsPerGoal = actualCurrentSavings / initialData.financialGoals.length;
+                const optimizedMonthlySavingsPerGoal = calculatePotentialSavings() / initialData.financialGoals.length;
+                
+                // Calculate time to goal based on remaining amount and monthly allocation
+                const currentTimeToGoal = Math.ceil(remainingAmount / Math.max(currentMonthlySavingsPerGoal, 1000));
+                const optimizedTimeToGoal = Math.ceil(remainingAmount / Math.max(optimizedMonthlySavingsPerGoal, 1000));
                 
                 return (
                   <Card key={goal.id || index} className="cosmic-card">
@@ -558,10 +566,14 @@ const WhatIfSimulator: React.FC<WhatIfSimulatorProps> = ({
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                      <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
                         <div className="text-center p-4 bg-slate-800/50 rounded-lg">
                           <div className="text-xs text-gray-400 mb-1">Target Amount</div>
                           <div className="font-mono text-lg text-stellar-gold">₹{goal.targetAmount.toLocaleString()}</div>
+                        </div>
+                        <div className="text-center p-4 bg-slate-800/50 rounded-lg">
+                          <div className="text-xs text-gray-400 mb-1">Current Amount</div>
+                          <div className="font-mono text-lg text-neon-cyan">₹{(goal.currentAmount || 0).toLocaleString()}</div>
                         </div>
                         <div className="text-center p-4 bg-slate-800/50 rounded-lg">
                           <div className="text-xs text-gray-400 mb-1">Time to Goal</div>
@@ -631,6 +643,15 @@ const WhatIfSimulator: React.FC<WhatIfSimulatorProps> = ({
                 />
               </CardContent>
             </Card>
+          )}
+
+          {/* Transformation Analysis */}
+          {initialData?.financialGoals && initialData.financialGoals.length > 0 && (
+            <TransformationAnalysis
+              goals={initialData.financialGoals}
+              currentMonthlySavings={actualCurrentSavings}
+              simulatedMonthlySavings={calculatePotentialSavings()}
+            />
           )}
         </div>
       )}
