@@ -195,8 +195,18 @@ const WhatIfSimulator: React.FC<WhatIfSimulatorProps> = ({
   };
 
   const generateGoalTimeline = () => {
-    const months = 24;
     const potentialSavings = calculatePotentialSavings();
+    
+    // Calculate months needed to reach the simulation target
+    const monthsToTarget = actualCurrentSavings > 0 
+      ? Math.ceil(simulationParams.goalTarget / actualCurrentSavings) 
+      : 24;
+    const optimizedMonthsToTarget = potentialSavings > 0 
+      ? Math.ceil(simulationParams.goalTarget / potentialSavings) 
+      : 24;
+    
+    // Use the longer timeline, with minimum 12 months and maximum 60 months
+    const months = Math.min(60, Math.max(12, Math.max(monthsToTarget, optimizedMonthsToTarget) + 6));
     
     return Array.from({ length: months }, (_, i) => ({
       month: `Month ${i + 1}`,
@@ -210,8 +220,19 @@ const WhatIfSimulator: React.FC<WhatIfSimulatorProps> = ({
 
   // Generate goal-specific timeline data
   const generateGoalSpecificTimeline = (goal: any, currentMonthlySavingsPerGoal: number, optimizedMonthlySavingsPerGoal: number) => {
-    const maxMonths = 48; // Show up to 4 years
     const currentAmount = goal.currentAmount || 0;
+    const remainingAmount = goal.targetAmount - currentAmount;
+    
+    // Calculate months needed to reach target for both scenarios
+    const currentMonthsToTarget = currentMonthlySavingsPerGoal > 0 
+      ? Math.ceil(remainingAmount / currentMonthlySavingsPerGoal) 
+      : 999;
+    const optimizedMonthsToTarget = optimizedMonthlySavingsPerGoal > 0 
+      ? Math.ceil(remainingAmount / optimizedMonthlySavingsPerGoal) 
+      : 999;
+    
+    // Use the longer timeline to show both scenarios, with a minimum of 12 months and maximum of 120 months (10 years)
+    const maxMonths = Math.min(120, Math.max(12, Math.max(currentMonthsToTarget, optimizedMonthsToTarget) + 6));
     
     return Array.from({ length: maxMonths }, (_, i) => ({
       month: `Month ${i + 1}`,
