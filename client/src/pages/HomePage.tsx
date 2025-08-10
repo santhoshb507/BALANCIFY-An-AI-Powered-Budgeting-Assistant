@@ -8,7 +8,7 @@ interface HomePageProps {
   onStartMission?: () => void;
 }
 
-const HomePage: React.FC<HomePageProps> = ({ onStartMission }) => {
+export function HomePage({ onStartMission }: HomePageProps) {
   const [currentFeature, setCurrentFeature] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
 
@@ -74,7 +74,7 @@ const HomePage: React.FC<HomePageProps> = ({ onStartMission }) => {
       {/* Hero Section */}
       <section className="relative min-h-screen flex items-center justify-center px-4">
         <div className={`max-w-6xl mx-auto text-center transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-          
+
           {/* Main Title */}
           <div className="mb-8 relative">
             <h1 className="font-orbitron text-6xl md:text-8xl font-black mb-6 relative">
@@ -197,7 +197,7 @@ const HomePage: React.FC<HomePageProps> = ({ onStartMission }) => {
           <div className="grid md:grid-cols-3 gap-8 relative">
             {/* Connection Lines */}
             <div className="hidden md:block absolute top-1/2 left-1/4 w-1/2 h-0.5 bg-gradient-to-r from-neon-cyan via-cosmic-purple to-neon-pink transform -translate-y-1/2" />
-            
+
             {[
               {
                 step: "01",
@@ -252,7 +252,7 @@ const HomePage: React.FC<HomePageProps> = ({ onStartMission }) => {
                   Join thousands of users who've revolutionized their financial planning with AI-powered insights.
                 </p>
               </div>
-              
+
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Button 
                   onClick={onStartMission}
@@ -263,7 +263,7 @@ const HomePage: React.FC<HomePageProps> = ({ onStartMission }) => {
                 </Button>
               </div>
             </CardContent>
-            
+
             {/* Background decoration */}
             <div className="absolute inset-0 bg-gradient-to-r from-cyan-400/5 via-purple-400/5 to-pink-400/5" />
           </Card>
