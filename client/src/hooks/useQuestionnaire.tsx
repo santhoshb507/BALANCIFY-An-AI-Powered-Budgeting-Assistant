@@ -96,14 +96,18 @@ export function useQuestionnaire() {
     setFormData(updatedData);
 
     // Save to session storage immediately
-    const savedSession = localStorage.getItem('balancify_session');
-    if (savedSession) {
-      const parsedSession = JSON.parse(savedSession);
-      const updatedSession = {
-        ...parsedSession,
-        formData: updatedData
-      };
-      localStorage.setItem('balancify_session', JSON.stringify(updatedSession));
+    try {
+      const savedSession = localStorage.getItem('balancify_session');
+      if (savedSession) {
+        const parsedSession = JSON.parse(savedSession);
+        const updatedSession = {
+          ...parsedSession,
+          formData: updatedData
+        };
+        localStorage.setItem('balancify_session', JSON.stringify(updatedSession));
+      }
+    } catch (error) {
+      console.warn('Failed to save form data to session:', error);
     }
   };
 

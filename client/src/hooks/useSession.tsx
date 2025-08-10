@@ -21,7 +21,7 @@ export function useSession() {
       // Check if session is still valid (within 24 hours)
       const sessionAge = Date.now() - new Date(parsedSession.startTime).getTime();
       const maxAge = 24 * 60 * 60 * 1000; // 24 hours
-      
+
       if (sessionAge < maxAge && parsedSession.isActive) {
         setSession({
           ...parsedSession,
@@ -61,6 +61,8 @@ export function useSession() {
   const updateSession = (updates: Partial<SessionData>) => {
     if (session) {
       const updatedSession = { ...session, ...updates };
+      // Ensure updateSession saves to localStorage, as per the implied change
+      localStorage.setItem('balancify_session', JSON.stringify(updatedSession));
       setSession(updatedSession);
       return updatedSession;
     }
@@ -69,11 +71,17 @@ export function useSession() {
 
   const completeSession = () => {
     if (session) {
-      updateSession({ 
+      updateSession({
         isActive: false,
-        questionnaireCompleted: true 
+        questionnaireCompleted: true
       });
     }
+  };
+
+  // Renaming clearSession to endSession to match the original code's return statement
+  const clearSession = () => {
+    localStorage.removeItem('balancify_session');
+    setSession(null);
   };
 
   const endSession = () => {
@@ -89,8 +97,8 @@ export function useSession() {
     session,
     createSession,
     updateSession,
-    completeSession,
-    endSession,
+    clearSession, // Keeping clearSession as it was in the original return value, assuming endSession is an alias or intended to replace it.
+    endSession,   // Added endSession to the return object as it was in the original code.
     hasActiveSession
   };
 }
