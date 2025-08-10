@@ -10,6 +10,7 @@ import { apiRequest } from '@/lib/queryClient';
 import { Zap, Play, RotateCcw, TrendingUp, Target, AlertCircle, CheckCircle } from 'lucide-react';
 import LiveTransformationChart from './charts/LiveTransformationChart';
 import GoalTimelineChart from './charts/GoalTimelineChart';
+import FinancialGoalsChart from './charts/FinancialGoalsChart';
 
 interface SimulationParams {
   incomeIncrease: number;
@@ -44,6 +45,13 @@ interface SimulationResult {
       milestone?: string;
     }>;
   };
+  individualGoals?: Array<{
+    description: string;
+    amount: number;
+    timeToAchieve: number;
+    monthlyRequired: number;
+    feasibility: string;
+  }>;
 }
 
 interface WhatIfSimulatorProps {
@@ -62,7 +70,7 @@ const WhatIfSimulator: React.FC<WhatIfSimulatorProps> = ({
     expenseReduction: 0,
     additionalSavings: 0,
     investmentBoost: 0,
-    goalTarget: initialData?.financialGoals?.[0]?.targetAmount || initialData?.spendingBreakdown?.savings * 120 || 1000000
+    goalTarget: initialData?.financialGoals?.[0]?.targetAmount || 1000000
   });
 
   const [simulationResult, setSimulationResult] = useState<SimulationResult | null>(null);
@@ -102,11 +110,11 @@ const WhatIfSimulator: React.FC<WhatIfSimulatorProps> = ({
           simulation: params
         }),
       });
-
+      
       if (!response.ok) {
         throw new Error('Simulation failed');
       }
-
+      
       return response.json();
     },
     onSuccess: (data: any) => {
@@ -123,7 +131,7 @@ const WhatIfSimulator: React.FC<WhatIfSimulatorProps> = ({
           goalTimeline: data.projections?.goalTimeline || []
         }
       };
-
+      
       setSimulationResult(normalizedData);
       setIsSimulating(false);
     },
@@ -144,7 +152,7 @@ const WhatIfSimulator: React.FC<WhatIfSimulatorProps> = ({
       expenseReduction: 0,
       additionalSavings: 0,
       investmentBoost: 0,
-      goalTarget: initialData?.financialGoals?.[0]?.targetAmount || initialData?.spendingBreakdown?.savings * 120 || 1000000
+      goalTarget: initialData?.financialGoals?.[0]?.targetAmount || 1000000
     });
     setSimulationResult(null);
     setSelectedScenario('custom');
@@ -162,11 +170,11 @@ const WhatIfSimulator: React.FC<WhatIfSimulatorProps> = ({
   const calculatePotentialSavings = () => {
     const monthlyIncome = initialData?.income?.monthly || 0;
     const monthlyExpenses = initialData?.expenses?.total || 0;
-
+    
     const newIncome = monthlyIncome * (1 + simulationParams.incomeIncrease / 100);
     const newExpenses = monthlyExpenses * (1 - simulationParams.expenseReduction / 100);
     const additionalMonthlySavings = (simulationParams.additionalSavings / 100) * monthlyIncome;
-
+    
     return newIncome - newExpenses + additionalMonthlySavings;
   };
 
@@ -174,12 +182,12 @@ const WhatIfSimulator: React.FC<WhatIfSimulatorProps> = ({
     // Auto-run simulation when parameters change significantly
     const totalChange = simulationParams.incomeIncrease + simulationParams.expenseReduction + 
                        simulationParams.additionalSavings + simulationParams.investmentBoost;
-
+    
     if (totalChange > 0 && !simulationMutation.isPending) {
       const timer = setTimeout(() => {
         runSimulation();
       }, 1000);
-
+      
       return () => clearTimeout(timer);
     }
   }, [simulationParams]);
@@ -198,7 +206,7 @@ const WhatIfSimulator: React.FC<WhatIfSimulatorProps> = ({
             Explore how different financial decisions could impact your goals
           </p>
         </CardHeader>
-
+        
         <CardContent className="space-y-6">
           {/* Predefined Scenarios */}
           <div>
@@ -352,7 +360,7 @@ const WhatIfSimulator: React.FC<WhatIfSimulatorProps> = ({
               )}
               Run Simulation
             </Button>
-
+            
             <Button
               onClick={resetSimulation}
               variant="outline"
@@ -376,7 +384,7 @@ const WhatIfSimulator: React.FC<WhatIfSimulatorProps> = ({
                 AI Analysis Results
               </CardTitle>
             </CardHeader>
-
+            
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-4">
@@ -386,7 +394,7 @@ const WhatIfSimulator: React.FC<WhatIfSimulatorProps> = ({
                     </div>
                     <p className="text-gray-300 text-sm">{simulationResult.insights.goalAchievability || 'Analysis in progress...'}</p>
                   </div>
-
+                  
                   <div>
                     <div className="bg-neon-cyan/20 text-neon-cyan border border-neon-cyan px-2 py-1 rounded text-xs font-semibold mb-2 inline-block">
                       Timeline
@@ -394,7 +402,7 @@ const WhatIfSimulator: React.FC<WhatIfSimulatorProps> = ({
                     <p className="text-gray-300 text-sm">{simulationResult.insights.timeToGoal || 'Calculating timeline...'}</p>
                   </div>
                 </div>
-
+                
                 <div className="space-y-4">
                   <div>
                     <div className="bg-cosmic-purple/20 text-cosmic-purple border border-cosmic-purple px-2 py-1 rounded text-xs font-semibold mb-2 inline-block">
@@ -402,7 +410,7 @@ const WhatIfSimulator: React.FC<WhatIfSimulatorProps> = ({
                     </div>
                     <p className="text-gray-300 text-sm">{simulationResult.insights.savingsImpact || 'Analyzing impact...'}</p>
                   </div>
-
+                  
                   <div>
                     <div className="bg-stellar-gold/20 text-stellar-gold border border-stellar-gold px-2 py-1 rounded text-xs font-semibold mb-2 inline-block">
                       Recommendations
@@ -442,6 +450,11 @@ const WhatIfSimulator: React.FC<WhatIfSimulatorProps> = ({
               simulatedDate={simulationResult.insights?.timeToGoal || 'Calculating...'}
               isSimulating={isSimulating}
             />
+          )}
+
+          {/* Financial Goals Chart */}
+          {simulationResult.individualGoals && simulationResult.individualGoals.length > 0 && (
+            <FinancialGoalsChart goals={simulationResult.individualGoals} />
           )}
         </div>
       )}
