@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
-import { FinancialData, AnalysisResult } from '@/types/financial';
+import { FinancialData, AnalysisResult, QuestionnaireData } from '@/types/financial';
 
 export function useQuestionnaire() {
   const [currentStep, setCurrentStep] = useState(0);
@@ -13,44 +13,44 @@ export function useQuestionnaire() {
       const sanitizedData = {
         // Personal Information
         name: data.name || "",
-        
+
         // Salary & Income
         monthly_income: data.monthly_income || 0,
         side_income: data.side_income || "No",
         side_income_amount: data.side_income_amount || 0,
         bonus_pay: data.bonus_pay || "No",
-        
+
         // Living Situation & Rent
         housing_status: data.housing_status || "Rent",
         housing_expenses: data.housing_expenses || 0,
         utility_bills: data.utility_bills || 0,
         household_size: Math.max(1, data.household_size || 1),
-        
+
         // Food & Dining
         groceries_weekly: data.groceries_weekly || 0,
         dining_monthly: data.dining_monthly || 0,
         food_ordering: data.food_ordering || "Rarely",
-        
+
         // Shopping Habits
         shopping_monthly: data.shopping_monthly || 0,
         impulse_shopping: data.impulse_shopping || 1,
         online_shopping: data.online_shopping || "Rarely",
-        
+
         // Subscriptions & Entertainment
         subscriptions: data.subscriptions || [],
         subscription_cost: data.subscription_cost || 0,
         entertainment_hours: data.entertainment_hours || 0,
-        
+
         // Travel & Transportation
         commute_cost: data.commute_cost || 0,
         transport_mode: data.transport_mode || "Public Transport",
         transport_monthly: data.transport_monthly || 0,
-        
+
         // Debt / Loans
         has_loans: data.has_loans || "No",
         loan_repayment: data.loan_repayment || 0,
         loan_type: data.loan_type || "Personal",
-        
+
         // Investments & Financial Goals
         investment_types: data.investment_types || [],
         monthly_investment: data.monthly_investment || 0,
@@ -61,13 +61,13 @@ export function useQuestionnaire() {
           priority: "high",
           category: "emergency"
         }],
-        
+
         // Budgeting Behavior & Mindset
         track_spending: data.track_spending || "No",
         impulse_control: data.impulse_control || 1,
         saving_behavior: data.saving_behavior || 1,
         risk_taking: data.risk_taking || "Low",
-        
+
         // Commitment & Willingness
         expense_reduction: data.expense_reduction || 1,
         preferred_savings: data.preferred_savings || 0,
@@ -81,18 +81,30 @@ export function useQuestionnaire() {
         },
         body: JSON.stringify(sanitizedData),
       });
-      
+
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.error || 'Failed to submit questionnaire');
       }
-      
+
       return response.json();
     },
   });
 
-  const updateFormData = (stepData: Partial<FinancialData>) => {
-    setFormData(prev => ({ ...prev, ...stepData }));
+  const updateFormData = (newData: Partial<QuestionnaireData>) => {
+    const updatedData = { ...formData, ...newData };
+    setFormData(updatedData);
+
+    // Save to session storage immediately
+    const savedSession = localStorage.getItem('balancify_session');
+    if (savedSession) {
+      const parsedSession = JSON.parse(savedSession);
+      const updatedSession = {
+        ...parsedSession,
+        formData: updatedData
+      };
+      localStorage.setItem('balancify_session', JSON.stringify(updatedSession));
+    }
   };
 
   const nextStep = () => {
@@ -106,11 +118,23 @@ export function useQuestionnaire() {
   const resetQuestionnaire = () => {
     setCurrentStep(0);
     setFormData({});
+    localStorage.removeItem('balancify_session'); // Clear session on reset
     submitQuestionnaire.reset();
   };
 
-  const loadFormDataFromSession = (sessionData: Partial<FinancialData>) => {
-    setFormData(prev => ({ ...prev, ...sessionData }));
+  const loadFormDataFromSession = (sessionFormData: any) => {
+    if (sessionFormData && Object.keys(sessionFormData).length > 0) {
+      setFormData(sessionFormData);
+      // Also restore the current step if it was saved
+      const completedFields = Object.keys(sessionFormData).filter(key => 
+        sessionFormData[key] !== null && 
+        sessionFormData[key] !== undefined && 
+        sessionFormData[key] !== ''
+      ).length;
+      // Estimate current step based on completed fields (rough estimate)
+      const estimatedStep = Math.min(Math.floor(completedFields / 3), 9);
+      setCurrentStep(estimatedStep);
+    }
   };
 
   return {

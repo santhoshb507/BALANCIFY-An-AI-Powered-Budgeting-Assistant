@@ -116,28 +116,25 @@ export function QuestionnairePage({ onComplete }: QuestionnairePageProps) {
 
   // Load session data on mount
   useEffect(() => {
-    if (session && session.userName) {
-      // Load session name into form if form is empty
-      if (!formData?.name) {
-        updateFormData({ name: session.userName });
-      }
-      // Load any saved form data from session
+    if (session && session.userName && session.userName !== 'S') {
+      // Load any saved form data from session first
       if (session.formData) {
         loadFormDataFromSession(session.formData);
+      } else {
+        // If no form data in session, at least set the name
+        updateFormData({ name: session.userName });
       }
     }
-  }, [session, formData?.name, updateFormData, loadFormDataFromSession]);
+  }, [session, updateFormData, loadFormDataFromSession]);
 
   // Create/update session when user enters name
   useEffect(() => {
-    if (formData?.name && formData.name.length > 0) {
+    if (formData?.name && formData.name.length > 0 && formData.name !== 'S') {
       if (!session || session.userName !== formData.name) {
         createSession(formData.name);
       } else {
         // Update session with current form data
-        if (updateSession) {
-          updateSession({ formData });
-        }
+        updateSession({ formData });
       }
     }
   }, [formData, session, createSession, updateSession]);

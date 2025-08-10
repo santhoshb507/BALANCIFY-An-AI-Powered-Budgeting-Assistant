@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { CosmicBackground } from '@/components/ui/cosmic-background';
 import { SpendingChart } from '@/components/charts/SpendingChart';
 import { NeedWantChart } from '@/components/charts/NeedWantChart';
@@ -36,7 +36,7 @@ export function DashboardPage({ analysisResult, onStartNew, onBackToHome }: Dash
       description: "Your session has been ended. You can start a new analysis anytime.",
     });
   };
-  
+
   const downloadReport = useMutation({
     mutationFn: async () => {
       const response = await fetch(`/api/report/${analysisResult.questionnaireId}`);
@@ -52,7 +52,7 @@ export function DashboardPage({ analysisResult, onStartNew, onBackToHome }: Dash
       a.click();
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
-      
+
       toast({
         title: "Report Downloaded",
         description: "Your financial analysis report has been downloaded successfully.",
@@ -121,7 +121,7 @@ export function DashboardPage({ analysisResult, onStartNew, onBackToHome }: Dash
   return (
     <div className="min-h-screen relative">
       <CosmicBackground />
-      
+
       <div className="relative z-10 py-20">
         <div className="max-w-7xl mx-auto px-4">
           {/* Dashboard Header with Session */}
@@ -137,7 +137,7 @@ export function DashboardPage({ analysisResult, onStartNew, onBackToHome }: Dash
               )}
               <p className="text-xl text-gray-300">Your Financial Cosmos Mapped</p>
             </div>
-            
+
             <div className="flex gap-3">
               {onBackToHome && (
                 <Button
@@ -262,7 +262,7 @@ export function DashboardPage({ analysisResult, onStartNew, onBackToHome }: Dash
                 </h3>
                 <p className="text-gray-300">Detailed breakdown and timeline for each of your financial goals</p>
               </div>
-              
+
               <div className="space-y-8">
                 {analysisResult.financialGoals.map((goal, index) => (
                   <IndividualGoalChart
@@ -350,7 +350,7 @@ export function DashboardPage({ analysisResult, onStartNew, onBackToHome }: Dash
               <Download className="mr-3 w-5 h-5" />
               {downloadReport.isPending ? 'Generating...' : 'Download Mission Report (PDF)'}
             </Button>
-            
+
             <Button
               onClick={onStartNew}
               variant="outline"

@@ -62,7 +62,9 @@ export function useSession() {
     if (session) {
       const updatedSession = { ...session, ...updates };
       setSession(updatedSession);
+      return updatedSession;
     }
+    return session;
   };
 
   const completeSession = () => {
