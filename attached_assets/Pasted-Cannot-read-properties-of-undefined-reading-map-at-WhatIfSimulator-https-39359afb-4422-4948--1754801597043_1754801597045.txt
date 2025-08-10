@@ -1,0 +1,28 @@
+Cannot read properties of undefined (reading 'map')
+at WhatIfSimulator (https://39359afb-4422-4948-8890-03858a9c2ffa-00-29lp5oy33odsn.kirk.replit.dev/src/components/WhatIfSimulator.tsx:699:227)
+at renderWithHooks (https://39359afb-4422-4948-8890-03858a9c2ffa-00-29lp5oy33odsn.kirk.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-WERSD76P.js?v=bd7ba29f:11548:26)
+at updateFunctionComponent (https://39359afb-4422-4948-8890-03858a9c2ffa-00-29lp5oy33odsn.kirk.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-WERSD76P.js?v=bd7ba29f:14582:28)
+at beginWork (https://39359afb-4422-4948-8890-03858a9c2ffa-00-29lp5oy33odsn.kirk.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-WERSD76P.js?v=bd7ba29f:15924:22)
+at HTMLUnknownElement.callCallback2 (https://39359afb-4422-4948-8890-03858a9c2ffa-00-29lp5oy33odsn.kirk.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-WERSD76P.js?v=bd7ba29f:3674:22)
+at Object.invokeGuardedCallbackDev (https://39359afb-4422-4948-8890-03858a9c2ffa-00-29lp5oy33odsn.kirk.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-WERSD76P.js?v=bd7ba29f:3699:24)
+at invokeGuardedCallback (https://39359afb-4422-4948-8890-03858a9c2ffa-00-29lp5oy33odsn.kirk.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-WERSD76P.js?v=bd7ba29f:3733:39)
+at beginWork$1 (https://39359afb-4422-4948-8890-03858a9c2ffa-00-29lp5oy33odsn.kirk.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-WERSD76P.js?v=bd7ba29f:19765:15)
+at performUnitOfWork (https://39359afb-4422-4948-8890-03858a9c2ffa-00-29lp5oy33odsn.kirk.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-WERSD76P.js?v=bd7ba29f:19198:20)
+at workLoopSync (https://39359afb-4422-4948-8890-03858a9c2ffa-00-29lp5oy33odsn.kirk.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-WERSD76P.js?v=bd7ba29f:19137:13)
+Cannot read properties of undefined (reading 'map')
+The above error occurred in the <WhatIfSimulator> component:
+
+    at WhatIfSimulator (https://39359afb-4422-4948-8890-03858a9c2ffa-00-29lp5oy33odsn.kirk.replit.dev/src/components/WhatIfSimulator.tsx:28:3)
+    at div
+    at div
+    at div
+    at div
+    at DashboardPage (https://39359afb-4422-4948-8890-03858a9c2ffa-00-29lp5oy33odsn.kirk.replit.dev/src/pages/DashboardPage.tsx:31:33)
+    at div
+    at Provider (https://39359afb-4422-4948-8890-03858a9c2ffa-00-29lp5oy33odsn.kirk.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-ZTXB6ZXA.js?v=bd7ba29f:32:15)
+    at TooltipProvider (https://39359afb-4422-4948-8890-03858a9c2ffa-00-29lp5oy33odsn.kirk.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-tooltip.js?v=bd7ba29f:57:5)
+    at QueryClientProvider (https://39359afb-4422-4948-8890-03858a9c2ffa-00-29lp5oy33odsn.kirk.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@tanstack_react-query.js?v=bd7ba29f:2805:3)
+    at App (https://39359afb-4422-4948-8890-03858a9c2ffa-00-29lp5oy33odsn.kirk.replit.dev/src/App.tsx?v=NHaJ89OMCST6SIZ3ai75T:28:43)
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://reactjs.org/link/error-boundaries to learn more about error boundaries.
