@@ -290,8 +290,8 @@ export function DashboardPage({ analysisResult, onStartNew, onBackToHome }: Dash
                   goalName={analysisResult.financialGoals?.[0]?.description || "Primary Financial Goal"}
                   targetAmount={analysisResult.goalTimeline.targetAmount}
                   currentAmount={analysisResult.goalTimeline.currentSavings}
-                  monthlyContribution={analysisResult.goalTimeline?.monthlyContribution || analysisResult.actualSavings || 0}
-                  actualSavings={analysisResult.spendingBreakdown?.savings || analysisResult.actualSavings || 0}
+                  monthlyContribution={analysisResult.goalTimeline?.monthlyContribution || 0}
+                  actualSavings={analysisResult.spendingBreakdown?.savings || 0}
                   projectedDate={`${new Date().getFullYear() + Math.ceil(analysisResult.goalTimeline.timeToGoal / 12)}-12-31`}
                 />
               </CardContent>
@@ -308,9 +308,9 @@ export function DashboardPage({ analysisResult, onStartNew, onBackToHome }: Dash
             <WhatIfSimulator
               questionnaireId={analysisResult.questionnaireId || `session-${Date.now()}`}
               initialData={{
-                income: { monthly: analysisResult.income?.monthly || analysisResult.monthlyIncome || 0 },
-                expenses: { total: analysisResult.expenses?.total || analysisResult.totalExpenses || 0 },
-                currentSavings: analysisResult.goalTimeline?.currentSavings || analysisResult.actualSavings || 0,
+                income: { monthly: analysisResult.monthlyIncome || 0 },
+                expenses: { total: analysisResult.totalExpenses || 0 },
+                currentSavings: analysisResult.goalTimeline?.currentSavings || 0,
                 financialGoals: analysisResult.financialGoals || [],
                 spendingBreakdown: analysisResult.spendingBreakdown || {}
               }}

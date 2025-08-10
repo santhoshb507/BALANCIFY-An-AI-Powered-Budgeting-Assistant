@@ -68,7 +68,7 @@ const WhatIfSimulator: React.FC<WhatIfSimulatorProps> = ({
     expenseReduction: 0,
     additionalSavings: 0,
     investmentBoost: 0,
-    goalTarget: initialData?.financialGoals?.reduce((sum, goal) => sum + goal.targetAmount, 0) || 1000000
+    goalTarget: initialData?.financialGoals?.reduce((sum: number, goal: any) => sum + goal.targetAmount, 0) || 1000000
   });
 
   const [simulationResult, setSimulationResult] = useState<SimulationResult | null>(null);
@@ -453,8 +453,6 @@ const WhatIfSimulator: React.FC<WhatIfSimulatorProps> = ({
                   goalName="Current vs Optimized Progress"
                   targetAmount={simulationParams.goalTarget}
                   currentAmount={initialData?.currentSavings || 0}
-                  monthlyContribution={calculatePotentialSavings()}
-                  actualSavings={actualCurrentSavings}
                   projectedDate={new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]}
                 />
               </CardContent>
@@ -465,7 +463,7 @@ const WhatIfSimulator: React.FC<WhatIfSimulatorProps> = ({
           {initialData?.financialGoals && initialData.financialGoals.length > 0 && (
             <div className="space-y-6">
               <h3 className="font-orbitron text-xl text-cosmic-gradient mb-4">Individual Goal Analysis</h3>
-              {initialData.financialGoals.map((goal, index) => {
+              {initialData.financialGoals.map((goal: any, index: number) => {
                 const currentTimeToGoal = Math.ceil(goal.targetAmount / (actualCurrentSavings / initialData.financialGoals.length || 1000));
                 const optimizedTimeToGoal = Math.ceil(goal.targetAmount / (calculatePotentialSavings() / initialData.financialGoals.length || 1000));
                 
@@ -504,9 +502,7 @@ const WhatIfSimulator: React.FC<WhatIfSimulatorProps> = ({
                         goalName={goal.description}
                         targetAmount={goal.targetAmount}
                         currentAmount={0}
-                        monthlyContribution={calculatePotentialSavings() / initialData.financialGoals.length}
-                        actualSavings={actualCurrentSavings / initialData.financialGoals.length}
-                        projectedDate={`${new Date().getFullYear() + optimizedTimeToGoal / 12}-12-31`}
+                        projectedDate={`${new Date().getFullYear() + Math.ceil(optimizedTimeToGoal / 12)}-12-31`}
                       />
                     </CardContent>
                   </Card>
@@ -533,7 +529,7 @@ const WhatIfSimulator: React.FC<WhatIfSimulatorProps> = ({
                   </div>
                   <div className="text-center p-4 bg-slate-800/50 rounded-lg">
                     <div className="text-xs text-gray-400 mb-1">Total Target</div>
-                    <div className="font-mono text-lg text-stellar-gold">₹{initialData.financialGoals.reduce((sum, goal) => sum + goal.targetAmount, 0).toLocaleString()}</div>
+                    <div className="font-mono text-lg text-stellar-gold">₹{initialData.financialGoals.reduce((sum: number, goal: any) => sum + goal.targetAmount, 0).toLocaleString()}</div>
                   </div>
                   <div className="text-center p-4 bg-slate-800/50 rounded-lg">
                     <div className="text-xs text-gray-400 mb-1">Last Goal Monthly Savings</div>
@@ -541,17 +537,15 @@ const WhatIfSimulator: React.FC<WhatIfSimulatorProps> = ({
                   </div>
                   <div className="text-center p-4 bg-slate-800/50 rounded-lg">
                     <div className="text-xs text-gray-400 mb-1">Optimized Time to Goal</div>
-                    <div className="font-mono text-lg text-cosmic-purple">{Math.ceil(initialData.financialGoals.reduce((sum, goal) => sum + goal.targetAmount, 0) / calculatePotentialSavings())} months</div>
+                    <div className="font-mono text-lg text-cosmic-purple">{Math.ceil(initialData.financialGoals.reduce((sum: number, goal: any) => sum + goal.targetAmount, 0) / calculatePotentialSavings())} months</div>
                   </div>
                 </div>
                 <GoalTimelineChart
                   data={simulationResult.projections.goalTimeline}
                   goalName="All Financial Goals Combined"
-                  targetAmount={initialData.financialGoals.reduce((sum, goal) => sum + goal.targetAmount, 0)}
+                  targetAmount={initialData.financialGoals.reduce((sum: number, goal: any) => sum + goal.targetAmount, 0)}
                   currentAmount={0}
-                  monthlyContribution={calculatePotentialSavings()}
-                  actualSavings={actualCurrentSavings}
-                  projectedDate={`${new Date().getFullYear() + Math.ceil(initialData.financialGoals.reduce((sum, goal) => sum + goal.targetAmount, 0) / calculatePotentialSavings() / 12)}-12-31`}
+                  projectedDate={`${new Date().getFullYear() + Math.ceil(initialData.financialGoals.reduce((sum: number, goal: any) => sum + goal.targetAmount, 0) / calculatePotentialSavings() / 12)}-12-31`}
                 />
               </CardContent>
             </Card>
