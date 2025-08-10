@@ -7,6 +7,7 @@ interface SessionData {
   isActive: boolean;
   questionnaireCompleted: boolean;
   analysisResult?: any;
+  formData?: any; // Store questionnaire progress
 }
 
 export function useSession() {

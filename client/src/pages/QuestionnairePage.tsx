@@ -97,7 +97,7 @@ interface QuestionnairePageProps {
 }
 
 export function QuestionnairePage({ onComplete }: QuestionnairePageProps) {
-  const { session, createSession } = useSession();
+  const { session, createSession, updateSession } = useSession();
   const {
     currentStep,
     formData,
@@ -105,6 +105,7 @@ export function QuestionnairePage({ onComplete }: QuestionnairePageProps) {
     nextStep,
     prevStep,
     submitQuestionnaire,
+    loadFormDataFromSession,
     isSubmitting,
     analysisResult,
     error,
@@ -113,19 +114,33 @@ export function QuestionnairePage({ onComplete }: QuestionnairePageProps) {
   const currentQuestion = questions[currentStep];
   const progress = ((currentStep + 1) / questions.length) * 100;
 
-  // Initialize session with user name when they first enter it
+  // Load session data on mount
   useEffect(() => {
-    if (formData?.name && !session?.userName) {
-      createSession(formData.name);
+    if (session && session.userName) {
+      // Load session name into form if form is empty
+      if (!formData?.name) {
+        updateFormData({ name: session.userName });
+      }
+      // Load any saved form data from session
+      if (session.formData) {
+        loadFormDataFromSession(session.formData);
+      }
     }
-  }, [formData?.name, session, createSession]);
+  }, [session, formData?.name, updateFormData, loadFormDataFromSession]);
 
-  // Load saved session data into form if exists
+  // Create/update session when user enters name
   useEffect(() => {
-    if (session && session.userName && (!formData?.name || formData.name === "")) {
-      updateFormData({ name: session.userName });
+    if (formData?.name && formData.name.length > 0) {
+      if (!session || session.userName !== formData.name) {
+        createSession(formData.name);
+      } else {
+        // Update session with current form data
+        if (updateSession) {
+          updateSession({ formData });
+        }
+      }
     }
-  }, [session, formData?.name, updateFormData]);
+  }, [formData, session, createSession, updateSession]);
 
   const handleNext = () => {
     if (currentStep === questions.length - 1) {

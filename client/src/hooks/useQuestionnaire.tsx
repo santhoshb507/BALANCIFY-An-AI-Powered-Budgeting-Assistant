@@ -5,9 +5,7 @@ import { FinancialData, AnalysisResult } from '@/types/financial';
 
 export function useQuestionnaire() {
   const [currentStep, setCurrentStep] = useState(0);
-  const [formData, setFormData] = useState<Partial<FinancialData>>({
-    name: "" // Initialize with empty string instead of undefined
-  });
+  const [formData, setFormData] = useState<Partial<FinancialData>>({});
 
   const submitQuestionnaire = useMutation({
     mutationFn: async (data: FinancialData): Promise<AnalysisResult> => {
@@ -111,6 +109,10 @@ export function useQuestionnaire() {
     submitQuestionnaire.reset();
   };
 
+  const loadFormDataFromSession = (sessionData: Partial<FinancialData>) => {
+    setFormData(prev => ({ ...prev, ...sessionData }));
+  };
+
   return {
     currentStep,
     formData,
@@ -118,6 +120,7 @@ export function useQuestionnaire() {
     nextStep,
     prevStep,
     resetQuestionnaire,
+    loadFormDataFromSession,
     submitQuestionnaire,
     isSubmitting: submitQuestionnaire.isPending,
     analysisResult: submitQuestionnaire.data,
