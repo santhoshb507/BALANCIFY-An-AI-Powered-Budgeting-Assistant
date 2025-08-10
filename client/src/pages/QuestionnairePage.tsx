@@ -1,7 +1,7 @@
 import { QuestionForm } from '@/components/questionnaire/QuestionForm';
 import { CosmicBackground } from '@/components/ui/cosmic-background';
 import { useQuestionnaire } from '@/hooks/useQuestionnaire';
-import { Question, FinancialData } from '@/types/financial';
+import { Question } from '@/types/financial';
 import { useEffect } from 'react';
 import { useSession } from '@/hooks/useSession';
 
@@ -70,7 +70,7 @@ const questions: Question[] = [
     fields: [
       { type: "checkbox", label: "Investment Types", id: "investment_types", options: ["Fixed Deposits", "Stocks", "Mutual Funds", "Crypto", "Gold"] },
       { type: "number", label: "Monthly Investment Amount (₹)", id: "monthly_investment", placeholder: "5000" },
-      { type: "textarea", label: "Financial Goals", id: "financial_goals" }
+      { type: "goal-builder", label: "Financial Goals", id: "financial_goals" }
     ]
   },
   {
@@ -97,7 +97,7 @@ interface QuestionnairePageProps {
 }
 
 export function QuestionnairePage({ onComplete }: QuestionnairePageProps) {
-  const { session, createSession, updateSession, saveFormProgress, saveQuestionnaireData } = useSession();
+  const { session, createSession, updateSession } = useSession();
   const {
     currentStep,
     formData,
@@ -114,48 +114,28 @@ export function QuestionnairePage({ onComplete }: QuestionnairePageProps) {
   const currentQuestion = questions[currentStep];
   const progress = ((currentStep + 1) / questions.length) * 100;
 
-  // Enhanced session-aware form change handler
+  // Simple form change handler without complex session logic
   const handleFormChange = (newData: Partial<FinancialData>) => {
     updateFormData(newData);
-    
-    // Auto-save progress to session on any meaningful change
-    if (session && Object.keys(newData).length > 0) {
-      saveFormProgress(newData, currentStep);
-    }
     
     // Create/update session only when user enters a real name (length > 1)
     if (newData.name && newData.name.length > 1) {
       if (!session) {
-        createSession(newData.name, questions.length);
+        createSession(newData.name);
       } else if (session.userName !== newData.name) {
-        createSession(newData.name, questions.length);
+        createSession(newData.name);
       }
     }
   };
 
   const handleNext = () => {
-    // Save progress to session before moving to next step
-    if (session) {
-      saveFormProgress(formData, currentStep);
-    }
-    
     if (currentStep === questions.length - 1) {
-      // Submit the questionnaire and save to session
-      if (session) {
-        saveQuestionnaireData(formData);
-      }
+      // Submit the questionnaire
       submitQuestionnaire.mutate(formData as any);
     } else {
       nextStep();
     }
   };
-
-  // Load session data if available on mount
-  useEffect(() => {
-    if (session?.formData && Object.keys(session.formData).length > 0) {
-      loadFormDataFromSession(session.formData, session.currentStep || 0);
-    }
-  }, [session?.sessionId]); // Only run when session changes
 
   useEffect(() => {
     if (analysisResult) {

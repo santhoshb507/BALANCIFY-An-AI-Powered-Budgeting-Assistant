@@ -57,7 +57,6 @@ export interface FinancialData {
   investment_types: string[];
   monthly_investment: number;
   financial_goals: string;
-  name: string;
   parsed_financial_goals?: FinancialGoal[];
   
   // Budgeting Behavior & Mindset

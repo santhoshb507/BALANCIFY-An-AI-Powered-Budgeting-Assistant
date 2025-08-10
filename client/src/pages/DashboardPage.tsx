@@ -28,7 +28,7 @@ interface DashboardPageProps {
 
 export function DashboardPage({ analysisResult, onStartNew, onBackToHome }: DashboardPageProps) {
   const { toast } = useToast();
-  const { session, endSession, resetToQuestionnaire } = useSession();
+  const { session, endSession } = useSession();
   const dashboardRef = useRef<HTMLDivElement>(null);
 
   const handleEndSession = () => {
@@ -37,19 +37,6 @@ export function DashboardPage({ analysisResult, onStartNew, onBackToHome }: Dash
     toast({
       title: "Session Ended",
       description: "Your session has been ended. You can start a new analysis anytime.",
-    });
-  };
-
-  const handleBackToHome = () => {
-    if (session) {
-      resetToQuestionnaire();
-    }
-    if (onBackToHome) {
-      onBackToHome();
-    }
-    toast({
-      title: "Returned to Home",
-      description: "Your session data is preserved. You can re-analyze anytime.",
     });
   };
   
@@ -202,21 +189,12 @@ export function DashboardPage({ analysisResult, onStartNew, onBackToHome }: Dash
                 </Button>
               )}
               <Button
-                onClick={downloadReport.mutate}
-                disabled={downloadReport.isPending}
-                className="cosmic-button"
-              >
-                <Download className="w-4 h-4 mr-2" />
-                {downloadReport.isPending ? "Generating..." : "Download Report"}
-              </Button>
-              
-              <Button
                 onClick={handleEndSession}
                 variant="outline"
                 className="cosmic-button border-red-500 text-red-400 hover:bg-red-500/10"
               >
                 <LogOut className="w-4 h-4 mr-2" />
-                Session Off
+                End Session
               </Button>
             </div>
           </div>
@@ -351,7 +329,7 @@ export function DashboardPage({ analysisResult, onStartNew, onBackToHome }: Dash
                   goalName={analysisResult.financialGoals?.[0]?.description || "Primary Financial Goal"}
                   targetAmount={analysisResult.goalTimeline.targetAmount}
                   currentAmount={analysisResult.goalTimeline.currentSavings}
-
+                  actualSavings={analysisResult.spendingBreakdown?.savings || 0}
                   projectedDate={`${new Date().getFullYear() + Math.ceil(analysisResult.goalTimeline.timeToGoal / 12)}-12-31`}
                 />
               </CardContent>
