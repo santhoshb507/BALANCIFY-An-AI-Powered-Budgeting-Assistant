@@ -13,21 +13,18 @@ type AppState = 'home' | 'questionnaire' | 'dashboard';
 function App() {
   const [currentState, setCurrentState] = useState<AppState>('home');
   const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
-  const [questionnaireData, setQuestionnaireData] = useState<any>(null); // Added to store questionnaire data
 
   const handleStartMission = () => {
     setCurrentState('questionnaire');
   };
 
-  const handleQuestionnaireComplete = (result: AnalysisResult, data: any) => { // Added data parameter
+  const handleQuestionnaireComplete = (result: AnalysisResult) => {
     setAnalysisResult(result);
-    setQuestionnaireData(data); // Store questionnaire data
     setCurrentState('dashboard');
   };
 
   const handleStartNew = () => {
     setAnalysisResult(null);
-    setQuestionnaireData(null); // Clear questionnaire data
     setCurrentState('home');
   };
 
@@ -38,13 +35,12 @@ function App() {
       case 'questionnaire':
         return <QuestionnairePage onComplete={handleQuestionnaireComplete} />;
       case 'dashboard':
-        return analysisResult && questionnaireData && (
+        return analysisResult ? (
           <DashboardPage 
             analysisResult={analysisResult} 
-            questionnaireData={questionnaireData} // Pass questionnaireData
             onStartNew={handleStartNew}
           />
-        );
+        ) : null;
       default:
         return <HomePage onStartMission={handleStartMission} />;
     }
