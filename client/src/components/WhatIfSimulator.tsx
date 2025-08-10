@@ -200,11 +200,26 @@ const WhatIfSimulator: React.FC<WhatIfSimulatorProps> = ({
     
     return Array.from({ length: months }, (_, i) => ({
       month: `Month ${i + 1}`,
-      currentProgress: actualCurrentSavings + (actualCurrentSavings * (i + 1)),
-      projectedProgress: actualCurrentSavings + (potentialSavings * (i + 1)),
-      simulatedProgress: actualCurrentSavings + (potentialSavings * (i + 1)),
+      currentProgress: actualCurrentSavings * (i + 1), // Cumulative current savings over time
+      projectedProgress: potentialSavings * (i + 1), // Cumulative optimized savings over time
+      simulatedProgress: potentialSavings * (i + 1), // Same as projected for simulation
       goalTarget: simulationParams.goalTarget,
       milestone: i % 6 === 0 ? `${Math.round((i + 1) / 6)} Quarter Progress` : undefined
+    }));
+  };
+
+  // Generate goal-specific timeline data
+  const generateGoalSpecificTimeline = (goal: any, currentMonthlySavingsPerGoal: number, optimizedMonthlySavingsPerGoal: number) => {
+    const maxMonths = 48; // Show up to 4 years
+    const currentAmount = goal.currentAmount || 0;
+    
+    return Array.from({ length: maxMonths }, (_, i) => ({
+      month: `Month ${i + 1}`,
+      currentProgress: currentAmount + (currentMonthlySavingsPerGoal * (i + 1)),
+      projectedProgress: currentAmount + (optimizedMonthlySavingsPerGoal * (i + 1)),
+      simulatedProgress: currentAmount + (optimizedMonthlySavingsPerGoal * (i + 1)),
+      goalTarget: goal.targetAmount,
+      milestone: i % 12 === 0 ? `Year ${Math.ceil((i + 1) / 12)}` : undefined
     }));
   };
 
@@ -510,7 +525,13 @@ const WhatIfSimulator: React.FC<WhatIfSimulatorProps> = ({
           {/* Live Transformation Chart */}
           {simulationResult.projections?.monthlyData && (
             <LiveTransformationChart
-              data={simulationResult.projections.monthlyData}
+              data={simulationResult.projections.monthlyData.map((item, i) => ({
+                ...item,
+                beforeScenario: actualCurrentSavings * (i + 1), // Corrected cumulative current savings
+                afterScenario: calculatePotentialSavings() * (i + 1), // Corrected cumulative optimized savings
+                savings: calculatePotentialSavings() - actualCurrentSavings, // Monthly difference
+                difference: (calculatePotentialSavings() - actualCurrentSavings) * (i + 1) // Cumulative difference
+              }))}
               title="Financial Transformation Analysis"
               scenario={selectedScenario}
               isLive={isSimulating}
@@ -615,13 +636,10 @@ const WhatIfSimulator: React.FC<WhatIfSimulatorProps> = ({
                         </div>
                       </div>
                       <GoalTimelineChart
-                        data={simulationResult.projections.goalTimeline.map((item, i) => ({
-                          ...item,
-                          goalTarget: goal.targetAmount
-                        }))}
+                        data={generateGoalSpecificTimeline(goal, currentMonthlySavingsPerGoal, optimizedMonthlySavingsPerGoal)}
                         goalName={goal.description}
                         targetAmount={goal.targetAmount}
-                        currentAmount={0}
+                        currentAmount={goal.currentAmount || 0}
                         projectedDate={`${new Date().getFullYear() + Math.ceil(optimizedTimeToGoal / 12)}-12-31`}
                       />
                     </CardContent>
