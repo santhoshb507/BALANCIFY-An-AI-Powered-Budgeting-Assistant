@@ -16,12 +16,13 @@ import { useToast } from '@/hooks/use-toast';
 
 interface DashboardPageProps {
   analysisResult: AnalysisResult;
-  onStartNew: () => void;
+  questionnaireData: any;
 }
 
-export function DashboardPage({ analysisResult, onStartNew }: DashboardPageProps) {
+export function DashboardPage({ analysisResult, questionnaireData }: DashboardPageProps) {
   const { toast } = useToast();
-  
+  const [simulationResults, setSimulationResults] = useState<any>(null);
+
   const downloadReport = useMutation({
     mutationFn: async () => {
       const response = await fetch(`/api/report/${analysisResult.questionnaireId}`);
@@ -37,7 +38,7 @@ export function DashboardPage({ analysisResult, onStartNew }: DashboardPageProps
       a.click();
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
-      
+
       toast({
         title: "Report Downloaded",
         description: "Your financial analysis report has been downloaded successfully.",
@@ -106,7 +107,7 @@ export function DashboardPage({ analysisResult, onStartNew }: DashboardPageProps
   return (
     <div className="min-h-screen relative">
       <CosmicBackground />
-      
+
       <div className="relative z-10 py-20">
         <div className="max-w-7xl mx-auto px-4">
           {/* Dashboard Header */}
@@ -194,6 +195,7 @@ export function DashboardPage({ analysisResult, onStartNew }: DashboardPageProps
                 financialGoals: [{ targetAmount: 1000000, description: "Emergency Fund" }],
                 spendingBreakdown: analysisResult.spendingBreakdown
               }}
+              onSimulationChange={setSimulationResults}
             />
           </div>
 
@@ -202,12 +204,12 @@ export function DashboardPage({ analysisResult, onStartNew }: DashboardPageProps
             <CardContent className="p-8">
               <GoalTimelineChart
                 data={[
-                  { month: "Jan", currentProgress: 50000, projectedProgress: 55000, simulatedProgress: 0, goalTarget: 1000000 },
-                  { month: "Feb", currentProgress: 65000, projectedProgress: 70000, simulatedProgress: 0, goalTarget: 1000000 },
-                  { month: "Mar", currentProgress: 80000, projectedProgress: 85000, simulatedProgress: 0, goalTarget: 1000000 },
-                  { month: "Apr", currentProgress: 95000, projectedProgress: 100000, simulatedProgress: 0, goalTarget: 1000000 },
-                  { month: "May", currentProgress: 110000, projectedProgress: 115000, simulatedProgress: 0, goalTarget: 1000000 },
-                  { month: "Jun", currentProgress: 125000, projectedProgress: 130000, simulatedProgress: 0, goalTarget: 1000000 }
+                  { month: "Jan", currentProgress: 50000, projectedProgress: 55000, simulatedProgress: simulationResults?.goalTimeline?.simulatedProgress || 0, goalTarget: 1000000 },
+                  { month: "Feb", currentProgress: 65000, projectedProgress: 70000, simulatedProgress: simulationResults?.goalTimeline?.simulatedProgress || 0, goalTarget: 1000000 },
+                  { month: "Mar", currentProgress: 80000, projectedProgress: 85000, simulatedProgress: simulationResults?.goalTimeline?.simulatedProgress || 0, goalTarget: 1000000 },
+                  { month: "Apr", currentProgress: 95000, projectedProgress: 100000, simulatedProgress: simulationResults?.goalTimeline?.simulatedProgress || 0, goalTarget: 1000000 },
+                  { month: "May", currentProgress: 110000, projectedProgress: 115000, simulatedProgress: simulationResults?.goalTimeline?.simulatedProgress || 0, goalTarget: 1000000 },
+                  { month: "Jun", currentProgress: 125000, projectedProgress: 130000, simulatedProgress: simulationResults?.goalTimeline?.simulatedProgress || 0, goalTarget: 1000000 }
                 ]}
                 goalName="Emergency Fund"
                 targetAmount={1000000}
@@ -219,7 +221,7 @@ export function DashboardPage({ analysisResult, onStartNew }: DashboardPageProps
 
           {/* Before/After Comparison */}
           <div className="mb-8">
-            <ComparisonTable data={comparisonData} />
+            <ComparisonTable data={comparisonData} simulationResults={simulationResults} />
           </div>
 
           {/* Action Buttons */}
@@ -232,7 +234,7 @@ export function DashboardPage({ analysisResult, onStartNew }: DashboardPageProps
               <Download className="mr-3 w-5 h-5" />
               {downloadReport.isPending ? 'Generating...' : 'Download Mission Report (PDF)'}
             </Button>
-            
+
             <Button
               onClick={onStartNew}
               variant="outline"
