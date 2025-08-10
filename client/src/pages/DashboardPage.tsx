@@ -6,7 +6,6 @@ import { SpendingChart } from '@/components/charts/SpendingChart';
 import { NeedWantChart } from '@/components/charts/NeedWantChart';
 import { CashFlowChart } from '@/components/charts/CashFlowChart';
 import GoalTimelineChart from '@/components/charts/GoalTimelineChart';
-import FinancialGoalsChart from '@/components/charts/FinancialGoalsChart';
 import { AIInsights } from '@/components/dashboard/AIInsights';
 import WhatIfSimulator from '@/components/WhatIfSimulator';
 import { ComparisonTable } from '@/components/dashboard/ComparisonTable';
@@ -184,25 +183,15 @@ export function DashboardPage({ analysisResult, onStartNew }: DashboardPageProps
             <AIInsights insights={analysisResult.insights} />
           </div>
 
-          {/* Financial Goals Chart */}
-          {analysisResult.financialGoals && analysisResult.financialGoals.length > 0 && (
-            <div className="mb-8">
-              <FinancialGoalsChart 
-                goals={analysisResult.financialGoals}
-                monthlySavings={analysisResult.spendingBreakdown.savings + analysisResult.spendingBreakdown.investments}
-              />
-            </div>
-          )}
-
           {/* What-If Simulator */}
           <div className="mb-8">
             <WhatIfSimulator
               questionnaireId={analysisResult.questionnaireId}
               initialData={{
-                income: { monthly: totalExpenses + analysisResult.spendingBreakdown.savings + analysisResult.spendingBreakdown.investments },
-                expenses: { total: totalExpenses },
-                currentSavings: analysisResult.goalTimeline.currentSavings,
-                financialGoals: analysisResult.financialGoals || [{ targetAmount: 1000000, description: "Emergency Fund" }],
+                income: { monthly: 100000 },
+                expenses: { total: 75000 },
+                currentSavings: 50000,
+                financialGoals: [{ targetAmount: 1000000, description: "Emergency Fund" }],
                 spendingBreakdown: analysisResult.spendingBreakdown
               }}
             />
