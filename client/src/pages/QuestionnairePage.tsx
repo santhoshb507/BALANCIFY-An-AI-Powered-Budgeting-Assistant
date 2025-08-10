@@ -1,9 +1,10 @@
 import { QuestionForm } from '@/components/questionnaire/QuestionForm';
 import { CosmicBackground } from '@/components/ui/cosmic-background';
 import { useQuestionnaire } from '@/hooks/useQuestionnaire';
-import { Question } from '@/types/financial';
+import { Question, FinancialData } from '@/types/financial';
 import { useEffect } from 'react';
 import { useSession } from '@/hooks/useSession';
+import { useToast } from '@/hooks/use-toast';
 
 const questions: Question[] = [
   {
@@ -97,7 +98,8 @@ interface QuestionnairePageProps {
 }
 
 export function QuestionnairePage({ onComplete }: QuestionnairePageProps) {
-  const { session, createSession, updateSession } = useSession();
+  const { session, createSession, updateSession, hasActiveSession } = useSession();
+  const { toast } = useToast();
   const {
     currentStep,
     formData,
@@ -110,6 +112,16 @@ export function QuestionnairePage({ onComplete }: QuestionnairePageProps) {
     analysisResult,
     error,
   } = useQuestionnaire();
+
+  // Show session recovery notification on first render
+  useEffect(() => {
+    if (hasActiveSession() && session?.formData) {
+      toast({
+        title: "Session Restored",
+        description: `Welcome back! Your progress has been restored from step ${(session?.currentStep || 0) + 1}.`,
+      });
+    }
+  }, []); // Only run once on mount
 
   const currentQuestion = questions[currentStep];
   const progress = ((currentStep + 1) / questions.length) * 100;

@@ -1,11 +1,28 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
 import { FinancialData, AnalysisResult } from '@/types/financial';
+import { useSession } from './useSession';
 
 export function useQuestionnaire() {
+  const { getSessionData, getCurrentStep, saveFormProgress, hasActiveSession } = useSession();
   const [currentStep, setCurrentStep] = useState(0);
   const [formData, setFormData] = useState<Partial<FinancialData>>({});
+
+  // Load session data on component mount
+  useEffect(() => {
+    if (hasActiveSession()) {
+      const sessionData = getSessionData();
+      const sessionStep = getCurrentStep();
+      
+      if (sessionData) {
+        setFormData(sessionData);
+      }
+      if (sessionStep >= 0) {
+        setCurrentStep(sessionStep);
+      }
+    }
+  }, []);
 
   const submitQuestionnaire = useMutation({
     mutationFn: async (data: FinancialData): Promise<AnalysisResult> => {
@@ -92,15 +109,33 @@ export function useQuestionnaire() {
   });
 
   const updateFormData = (stepData: Partial<FinancialData>) => {
-    setFormData(prev => ({ ...prev, ...stepData }));
+    const newFormData = { ...formData, ...stepData };
+    setFormData(newFormData);
+    
+    // Save to session automatically
+    if (hasActiveSession()) {
+      saveFormProgress(newFormData, currentStep);
+    }
   };
 
   const nextStep = () => {
-    setCurrentStep(prev => prev + 1);
+    const newStep = currentStep + 1;
+    setCurrentStep(newStep);
+    
+    // Save step progress to session
+    if (hasActiveSession()) {
+      saveFormProgress(formData, newStep);
+    }
   };
 
   const prevStep = () => {
-    setCurrentStep(prev => Math.max(0, prev - 1));
+    const newStep = Math.max(0, currentStep - 1);
+    setCurrentStep(newStep);
+    
+    // Save step progress to session
+    if (hasActiveSession()) {
+      saveFormProgress(formData, newStep);
+    }
   };
 
   const resetQuestionnaire = () => {

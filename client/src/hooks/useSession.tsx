@@ -8,6 +8,8 @@ interface SessionData {
   questionnaireCompleted: boolean;
   analysisResult?: any;
   formData?: any; // Store questionnaire progress
+  currentStep?: number; // Current questionnaire step
+  lastUpdated?: Date; // Last time session was updated
 }
 
 export function useSession() {
@@ -61,6 +63,16 @@ export function useSession() {
     }
   };
 
+  const saveFormProgress = (formData: any, currentStep: number) => {
+    if (session) {
+      updateSession({ 
+        formData: { ...formData },
+        currentStep: currentStep,
+        lastUpdated: new Date()
+      });
+    }
+  };
+
   const completeSession = () => {
     if (session) {
       updateSession({ 
@@ -79,12 +91,23 @@ export function useSession() {
     return session?.isActive && !session?.questionnaireCompleted;
   };
 
+  const getSessionData = () => {
+    return session?.formData || null;
+  };
+
+  const getCurrentStep = () => {
+    return session?.currentStep || 0;
+  };
+
   return {
     session,
     createSession,
     updateSession,
+    saveFormProgress,
     completeSession,
     endSession,
-    hasActiveSession
+    hasActiveSession,
+    getSessionData,
+    getCurrentStep
   };
 }

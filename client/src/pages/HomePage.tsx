@@ -2,7 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'wouter';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Rocket, Sparkles, Brain, TrendingUp, Shield, Zap, ChevronRight, Star, Globe } from 'lucide-react';
+import { useSession } from '@/hooks/useSession';
+import { useToast } from '@/hooks/use-toast';
+import { Rocket, Sparkles, Brain, TrendingUp, Shield, Zap, ChevronRight, Star, Globe, RefreshCw, Trash2 } from 'lucide-react';
 
 interface HomePageProps {
   onStartMission?: () => void;
@@ -11,6 +13,8 @@ interface HomePageProps {
 const HomePage: React.FC<HomePageProps> = ({ onStartMission }) => {
   const [currentFeature, setCurrentFeature] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
+  const { session, hasActiveSession, endSession } = useSession();
+  const { toast } = useToast();
 
   useEffect(() => {
     setIsVisible(true);
@@ -19,6 +23,26 @@ const HomePage: React.FC<HomePageProps> = ({ onStartMission }) => {
     }, 4000);
     return () => clearInterval(interval);
   }, []);
+
+  const handleContinueSession = () => {
+    if (hasActiveSession()) {
+      toast({
+        title: "Session Restored",
+        description: `Welcome back! Continuing your questionnaire from step ${(session?.currentStep || 0) + 1}.`,
+      });
+      onStartMission?.();
+    }
+  };
+
+  const handleEndSession = () => {
+    if (hasActiveSession()) {
+      endSession();
+      toast({
+        title: "Session Ended",
+        description: "Your previous session has been cleared. You can start fresh now.",
+      });
+    }
+  };
 
   const features = [
     {
@@ -103,6 +127,39 @@ const HomePage: React.FC<HomePageProps> = ({ onStartMission }) => {
             that adapt to your lifestyle.
           </p>
 
+          {/* Session Recovery Section */}
+          {hasActiveSession() && (
+            <Card className="mb-8 mx-auto max-w-2xl bg-gradient-to-r from-cyan-500/10 to-purple-500/10 border-cyan-500/30 backdrop-blur-sm">
+              <CardContent className="p-6 text-center">
+                <div className="flex items-center justify-center gap-2 mb-4">
+                  <RefreshCw className="w-5 h-5 text-neon-cyan animate-spin" />
+                  <h3 className="text-lg font-semibold text-neon-cyan">Session Recovery Available</h3>
+                </div>
+                <p className="text-gray-300 mb-4">
+                  Found an active session from {session?.userName}. You can continue from step {(session?.currentStep || 0) + 1} 
+                  or start fresh.
+                </p>
+                <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                  <Button 
+                    onClick={handleContinueSession}
+                    className="bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white px-6 py-2 group"
+                  >
+                    <RefreshCw className="w-4 h-4 mr-2 group-hover:rotate-180 transition-transform duration-300" />
+                    Continue Session
+                  </Button>
+                  <Button 
+                    onClick={handleEndSession}
+                    variant="outline"
+                    className="border-red-500/50 text-red-400 hover:bg-red-500/10 hover:border-red-400 px-6 py-2"
+                  >
+                    <Trash2 className="w-4 h-4 mr-2" />
+                    End Session
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row gap-6 justify-center mb-16">
             <Button 
@@ -110,7 +167,7 @@ const HomePage: React.FC<HomePageProps> = ({ onStartMission }) => {
               className="cosmic-button px-10 py-4 text-lg font-semibold group relative overflow-hidden"
             >
               <Rocket className="w-6 h-6 mr-2 group-hover:rotate-12 transition-transform" />
-              Launch Financial Analysis
+              {hasActiveSession() ? 'Start New Analysis' : 'Launch Financial Analysis'}
               <ChevronRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
             </Button>
             <Button 
