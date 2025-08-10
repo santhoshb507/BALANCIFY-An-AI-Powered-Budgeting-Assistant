@@ -71,7 +71,7 @@ const questions: Question[] = [
     fields: [
       { type: "checkbox", label: "Investment Types", id: "investment_types", options: ["Fixed Deposits", "Stocks", "Mutual Funds", "Crypto", "Gold"] },
       { type: "number", label: "Monthly Investment Amount (₹)", id: "monthly_investment", placeholder: "5000" },
-      { type: "textarea", label: "Financial Goals", id: "financial_goals" }
+      { type: "checkbox", label: "Financial Goal Priorities", id: "financial_goals", options: ["Emergency Fund (High Priority)", "House Purchase (High Priority)", "Retirement Planning (Medium Priority)", "Education Fund (Medium Priority)", "Investment Growth (Low Priority)", "Travel Fund (Low Priority)"] }
     ]
   },
   {
