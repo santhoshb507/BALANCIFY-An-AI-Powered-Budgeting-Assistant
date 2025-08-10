@@ -5,9 +5,9 @@ import { CosmicBackground } from '@/components/ui/cosmic-background';
 import { SpendingChart } from '@/components/charts/SpendingChart';
 import { NeedWantChart } from '@/components/charts/NeedWantChart';
 import { CashFlowChart } from '@/components/charts/CashFlowChart';
-import { GoalTimelineChart } from '@/components/charts/GoalTimelineChart';
+import GoalTimelineChart from '@/components/charts/GoalTimelineChart';
 import { AIInsights } from '@/components/dashboard/AIInsights';
-import { WhatIfSimulator } from '@/components/dashboard/WhatIfSimulator';
+import WhatIfSimulator from '@/components/WhatIfSimulator';
 import { ComparisonTable } from '@/components/dashboard/ComparisonTable';
 import { AnalysisResult } from '@/types/financial';
 import { Download, RotateCcw } from 'lucide-react';
@@ -187,22 +187,32 @@ export function DashboardPage({ analysisResult, onStartNew }: DashboardPageProps
           <div className="mb-8">
             <WhatIfSimulator
               questionnaireId={analysisResult.questionnaireId}
-              originalData={{
-                preferred_savings: analysisResult.spendingBreakdown.savings,
-                subscription_cost: analysisResult.spendingBreakdown.subscriptions,
-                entertainment_hours: 20, // Estimated
-                shopping_monthly: analysisResult.spendingBreakdown.shopping,
-                dining_monthly: Math.round(analysisResult.spendingBreakdown.food * 0.4), // Estimated dining portion
+              initialData={{
+                income: { monthly: 100000 },
+                expenses: { total: 75000 },
+                currentSavings: 50000,
+                financialGoals: [{ targetAmount: 1000000, description: "Emergency Fund" }],
+                spendingBreakdown: analysisResult.spendingBreakdown
               }}
             />
           </div>
 
           {/* Goal Timeline */}
-          <Card className="glass-effect border-white/20 mb-8">
+          <Card className="cosmic-card mb-8">
             <CardContent className="p-8">
               <GoalTimelineChart
-                milestones={analysisResult.goalTimeline.milestones}
-                targetAmount={analysisResult.goalTimeline.targetAmount}
+                data={[
+                  { month: "Jan", currentProgress: 50000, projectedProgress: 55000, simulatedProgress: 0, goalTarget: 1000000 },
+                  { month: "Feb", currentProgress: 65000, projectedProgress: 70000, simulatedProgress: 0, goalTarget: 1000000 },
+                  { month: "Mar", currentProgress: 80000, projectedProgress: 85000, simulatedProgress: 0, goalTarget: 1000000 },
+                  { month: "Apr", currentProgress: 95000, projectedProgress: 100000, simulatedProgress: 0, goalTarget: 1000000 },
+                  { month: "May", currentProgress: 110000, projectedProgress: 115000, simulatedProgress: 0, goalTarget: 1000000 },
+                  { month: "Jun", currentProgress: 125000, projectedProgress: 130000, simulatedProgress: 0, goalTarget: 1000000 }
+                ]}
+                goalName="Emergency Fund"
+                targetAmount={1000000}
+                currentAmount={50000}
+                projectedDate="2025-12-31"
               />
             </CardContent>
           </Card>
