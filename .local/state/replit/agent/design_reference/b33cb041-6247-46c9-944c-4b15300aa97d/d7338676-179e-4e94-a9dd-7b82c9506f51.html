@@ -1,0 +1,919 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Balancify AI - Space-Age Financial Intelligence</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+    tailwind.config = {
+        theme: {
+            extend: {
+                fontFamily: {
+                    'orbitron': ['Orbitron', 'monospace'],
+                    'inter': ['Inter', 'sans-serif']
+                },
+                colors: {
+                    'space': {
+                        50: '#f0f9ff',
+                        100: '#e0f2fe',
+                        200: '#bae6fd',
+                        300: '#7dd3fc',
+                        400: '#38bdf8',
+                        500: '#0ea5e9',
+                        600: '#0284c7',
+                        700: '#0369a1',
+                        800: '#075985',
+                        900: '#0c4a6e',
+                        950: '#082f49'
+                    },
+                    'cosmic': {
+                        50: '#fdf4ff',
+                        100: '#fae8ff',
+                        200: '#f5d0fe',
+                        300: '#f0abfc',
+                        400: '#e879f9',
+                        500: '#d946ef',
+                        600: '#c026d3',
+                        700: '#a21caf',
+                        800: '#86198f',
+                        900: '#701a75',
+                        950: '#4a044e'
+                    },
+                    'neon': {
+                        cyan: '#00F5FF',
+                        green: '#39FF14',
+                        purple: '#BF00FF',
+                        pink: '#FF1493'
+                    }
+                },
+                backgroundImage: {
+                    'cosmic-gradient': 'linear-gradient(135deg, #0B0B1F 0%, #1A1A3A 50%, #2D1B69 100%)',
+                    'glass-gradient': 'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)'
+                },
+                animation: {
+                    'float': 'float 3s ease-in-out infinite',
+                    'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    'glow': 'glow 2s ease-in-out infinite alternate'
+                }
+            }
+        }
+    };
+    </script>
+    
+    <style>
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        @keyframes glow {
+            from { text-shadow: 0 0 5px #00F5FF, 0 0 10px #00F5FF, 0 0 15px #00F5FF; }
+            to { text-shadow: 0 0 10px #00F5FF, 0 0 20px #00F5FF, 0 0 30px #00F5FF; }
+        }
+        
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .particle-bg::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(circle at 20% 50%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 40% 80%, rgba(120, 219, 255, 0.3) 0%, transparent 50%);
+            animation: float 4s ease-in-out infinite;
+        }
+        
+        .neon-border {
+            box-shadow: 0 0 5px #00F5FF, 0 0 10px #00F5FF, 0 0 15px #00F5FF;
+        }
+        
+        .neon-text {
+            text-shadow: 0 0 5px currentColor, 0 0 10px currentColor, 0 0 15px currentColor;
+        }
+        
+        .chart-3d {
+            filter: drop-shadow(0 10px 20px rgba(0, 245, 255, 0.3));
+        }
+        
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #1A1A3A;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, #00F5FF, #6B46C1);
+            border-radius: 10px;
+        }
+    </style>
+</head>
+
+<body class="bg-cosmic-gradient min-h-screen text-white font-inter overflow-x-hidden">
+    <!-- Particle Background -->
+    <div class="fixed inset-0 particle-bg pointer-events-none z-0"></div>
+    
+    <!-- Navigation -->
+    <nav class="relative z-10 glass-effect border-b border-white/20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-rocket text-neon-cyan text-2xl"></i>
+                    <span class="font-orbitron text-xl font-bold neon-text text-neon-cyan">Balancify AI</span>
+                </div>
+                <button class="glass-effect px-4 py-2 rounded-lg hover:neon-border transition-all duration-300">
+                    <i class="fas fa-user-astronaut mr-2"></i>
+                    Mission Control
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content Container -->
+    <div id="app-container" class="relative z-10">
+        
+        <!-- Homepage Section -->
+        <section id="homepage" class="min-h-screen flex items-center justify-center relative">
+            <div class="text-center space-y-8 max-w-4xl mx-auto px-4">
+                <!-- Hero Animation -->
+                <div class="animate-float">
+                    <i class="fas fa-satellite text-8xl text-neon-cyan mb-8 animate-glow"></i>
+                </div>
+                
+                <!-- Main Heading -->
+                <h1 class="font-orbitron text-5xl md:text-7xl font-black mb-6">
+                    <span class="neon-text text-neon-cyan">BALANCIFY</span>
+                    <span class="block text-3xl md:text-4xl text-cosmic-300 mt-2">AI Financial Navigator</span>
+                </h1>
+                
+                <!-- Subheading -->
+                <p class="text-xl md:text-2xl text-gray-300 max-w-3xl mx-auto leading-relaxed">
+                    Navigate the cosmos of your finances with advanced AI-powered insights. 
+                    Transform your spending patterns and reach your financial destination with precision.
+                </p>
+                
+                <!-- CTA Button -->
+                <div class="pt-8">
+                    <button 
+                        onclick="startMission()" 
+                        class="group relative px-8 py-4 bg-gradient-to-r from-cosmic-600 to-space-600 rounded-full text-xl font-semibold hover:from-cosmic-500 hover:to-space-500 transform hover:scale-105 transition-all duration-300 neon-border"
+                    >
+                        <i class="fas fa-rocket mr-3 group-hover:animate-pulse"></i>
+                        Launch Financial Mission
+                        <div class="absolute inset-0 bg-gradient-to-r from-neon-cyan to-cosmic-400 rounded-full opacity-0 group-hover:opacity-20 transition-opacity duration-300"></div>
+                    </button>
+                </div>
+                
+                <!-- Feature Highlights -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-16">
+                    <div class="glass-effect p-6 rounded-xl text-center transform hover:scale-105 transition-all duration-300">
+                        <i class="fas fa-brain text-3xl text-neon-cyan mb-4"></i>
+                        <h3 class="font-orbitron font-bold mb-2">AI-Powered Analysis</h3>
+                        <p class="text-gray-400">Advanced machine learning algorithms analyze your spending patterns</p>
+                    </div>
+                    <div class="glass-effect p-6 rounded-xl text-center transform hover:scale-105 transition-all duration-300">
+                        <i class="fas fa-chart-pie text-3xl text-cosmic-400 mb-4"></i>
+                        <h3 class="font-orbitron font-bold mb-2">3D Visualizations</h3>
+                        <p class="text-gray-400">Interactive charts and graphs bring your data to life</p>
+                    </div>
+                    <div class="glass-effect p-6 rounded-xl text-center transform hover:scale-105 transition-all duration-300">
+                        <i class="fas fa-target text-3xl text-neon-green mb-4"></i>
+                        <h3 class="font-orbitron font-bold mb-2">Goal Tracking</h3>
+                        <p class="text-gray-400">Real-time progress monitoring towards your financial objectives</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Questionnaire Section -->
+        <section id="questionnaire" class="hidden min-h-screen py-20">
+            <div class="max-w-4xl mx-auto px-4">
+                <!-- Progress Header -->
+                <div class="glass-effect p-6 rounded-xl mb-8">
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="font-orbitron text-2xl font-bold text-neon-cyan">Mission Briefing</h2>
+                        <span id="progress-text" class="text-cosmic-300">Step 1 of 10</span>
+                    </div>
+                    <div class="w-full bg-gray-700 rounded-full h-3">
+                        <div id="progress-bar" class="bg-gradient-to-r from-neon-cyan to-cosmic-400 h-3 rounded-full transition-all duration-500" style="width: 10%"></div>
+                    </div>
+                </div>
+
+                <!-- Question Container -->
+                <div id="question-container" class="glass-effect p-8 rounded-xl">
+                    <!-- Questions will be dynamically loaded here -->
+                </div>
+
+                <!-- Navigation Buttons -->
+                <div class="flex justify-between mt-8">
+                    <button 
+                        id="prev-btn" 
+                        onclick="previousQuestion()" 
+                        class="px-6 py-3 glass-effect rounded-lg hover:neon-border transition-all duration-300 disabled:opacity-50"
+                        disabled
+                    >
+                        <i class="fas fa-chevron-left mr-2"></i>Previous
+                    </button>
+                    <button 
+                        id="next-btn" 
+                        onclick="nextQuestion()" 
+                        class="px-6 py-3 bg-gradient-to-r from-cosmic-600 to-space-600 rounded-lg hover:from-cosmic-500 hover:to-space-500 transition-all duration-300"
+                    >
+                        Next<i class="fas fa-chevron-right ml-2"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Results Dashboard -->
+        <section id="dashboard" class="hidden min-h-screen py-20">
+            <div class="max-w-7xl mx-auto px-4">
+                <!-- Dashboard Header -->
+                <div class="text-center mb-12">
+                    <h2 class="font-orbitron text-4xl font-bold mb-4">
+                        <span class="neon-text text-neon-cyan">Mission Analysis</span>
+                    </h2>
+                    <p class="text-xl text-gray-300">Your Financial Cosmos Mapped</p>
+                </div>
+
+                <!-- Main Dashboard Grid -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+                    <!-- Overall Spending Pie Chart -->
+                    <div class="glass-effect p-6 rounded-xl">
+                        <h3 class="font-orbitron text-xl font-bold mb-4 text-center">
+                            <i class="fas fa-chart-pie mr-2 text-neon-cyan"></i>
+                            Overall Spending Distribution
+                        </h3>
+                        <div class="chart-3d">
+                            <canvas id="overallSpendingChart" width="400" height="400"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Need vs Want Chart -->
+                    <div class="glass-effect p-6 rounded-xl">
+                        <h3 class="font-orbitron text-xl font-bold mb-4 text-center">
+                            <i class="fas fa-balance-scale mr-2 text-cosmic-400"></i>
+                            Needs vs Wants Analysis
+                        </h3>
+                        <div class="chart-3d">
+                            <canvas id="needWantChart" width="400" height="400"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Secondary Charts Row -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
+                    <!-- Needs Breakdown -->
+                    <div class="glass-effect p-6 rounded-xl">
+                        <h3 class="font-orbitron text-lg font-bold mb-4 text-center text-neon-green">
+                            Essential Needs
+                        </h3>
+                        <canvas id="needsChart" width="300" height="300"></canvas>
+                    </div>
+
+                    <!-- Wants Breakdown -->
+                    <div class="glass-effect p-6 rounded-xl">
+                        <h3 class="font-orbitron text-lg font-bold mb-4 text-center text-neon-purple">
+                            Lifestyle Wants
+                        </h3>
+                        <canvas id="wantsChart" width="300" height="300"></canvas>
+                    </div>
+
+                    <!-- Income Flow -->
+                    <div class="glass-effect p-6 rounded-xl">
+                        <h3 class="font-orbitron text-lg font-bold mb-4 text-center text-neon-cyan">
+                            Cash Flow Analysis
+                        </h3>
+                        <canvas id="cashFlowChart" width="300" height="300"></canvas>
+                    </div>
+                </div>
+
+                <!-- AI Insights Section -->
+                <div class="glass-effect p-8 rounded-xl mb-8">
+                    <h3 class="font-orbitron text-2xl font-bold mb-6 text-center">
+                        <i class="fas fa-robot mr-3 text-neon-cyan"></i>
+                        AI Financial Intelligence Report
+                    </h3>
+                    <div id="ai-insights" class="space-y-4">
+                        <!-- AI insights will be populated here -->
+                        <div class="p-4 bg-gradient-to-r from-cosmic-900/50 to-space-900/50 rounded-lg border-l-4 border-neon-cyan">
+                            <h4 class="font-semibold text-neon-cyan mb-2">💡 Spending Pattern Analysis</h4>
+                            <p class="text-gray-300">Based on your data, you show strong financial discipline with 68% of spending on essential needs. Consider optimizing your dining expenses for additional savings.</p>
+                        </div>
+                        <div class="p-4 bg-gradient-to-r from-cosmic-900/50 to-space-900/50 rounded-lg border-l-4 border-neon-green">
+                            <h4 class="font-semibold text-neon-green mb-2">🚀 Optimization Opportunity</h4>
+                            <p class="text-gray-300">Reducing subscription services by 30% could free up ₹2,400 monthly for your investment goals without significantly impacting lifestyle.</p>
+                        </div>
+                        <div class="p-4 bg-gradient-to-r from-cosmic-900/50 to-space-900/50 rounded-lg border-l-4 border-neon-purple">
+                            <h4 class="font-semibold text-neon-purple mb-2">📈 Investment Recommendation</h4>
+                            <p class="text-gray-300">Your risk profile suggests increasing equity allocation to 65% for optimal long-term growth aligned with your 10-year financial goals.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- What-If Simulator -->
+                <div class="glass-effect p-8 rounded-xl mb-8">
+                    <h3 class="font-orbitron text-2xl font-bold mb-6 text-center">
+                        <i class="fas fa-calculator mr-3 text-cosmic-400"></i>
+                        What-If Mission Simulator
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium mb-2">Adjust Monthly Savings (+/-)</label>
+                                <input type="range" id="savings-slider" min="-50" max="100" value="0" 
+                                       class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider">
+                                <div class="flex justify-between text-xs text-gray-400 mt-1">
+                                    <span>-50%</span>
+                                    <span id="savings-value">0%</span>
+                                    <span>+100%</span>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-2">Reduce Entertainment Spending</label>
+                                <input type="range" id="entertainment-slider" min="0" max="80" value="0" 
+                                       class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider">
+                                <div class="flex justify-between text-xs text-gray-400 mt-1">
+                                    <span>0%</span>
+                                    <span id="entertainment-value">0%</span>
+                                    <span>80%</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="glass-effect p-4 rounded-lg">
+                            <h4 class="font-semibold mb-3 text-neon-cyan">Simulation Results</h4>
+                            <div class="space-y-2 text-sm">
+                                <div class="flex justify-between">
+                                    <span>Monthly Savings Impact:</span>
+                                    <span id="savings-impact" class="text-neon-green">+₹0</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span>Goal Achievement:</span>
+                                    <span id="goal-timeline" class="text-neon-cyan">36 months</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span>Investment Growth:</span>
+                                    <span id="investment-growth" class="text-cosmic-400">₹0</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Goal Timeline -->
+                <div class="glass-effect p-8 rounded-xl mb-8">
+                    <h3 class="font-orbitron text-2xl font-bold mb-6 text-center">
+                        <i class="fas fa-timeline mr-3 text-neon-green"></i>
+                        Financial Goal Timeline
+                    </h3>
+                    <div class="relative">
+                        <canvas id="goalTimelineChart" width="800" height="300"></canvas>
+                    </div>
+                </div>
+
+                <!-- Before/After Comparison -->
+                <div class="glass-effect p-8 rounded-xl mb-8">
+                    <h3 class="font-orbitron text-2xl font-bold mb-6 text-center">
+                        <i class="fas fa-exchange-alt mr-3 text-cosmic-400"></i>
+                        Transformation Analysis
+                    </h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm">
+                            <thead>
+                                <tr class="border-b border-gray-600">
+                                    <th class="text-left py-3 px-4 font-orbitron">Category</th>
+                                    <th class="text-center py-3 px-4 text-red-400">Before Optimization</th>
+                                    <th class="text-center py-3 px-4 text-neon-green">After Optimization</th>
+                                    <th class="text-center py-3 px-4 text-neon-cyan">Impact</th>
+                                </tr>
+                            </thead>
+                            <tbody id="comparison-table">
+                                <!-- Table rows will be populated dynamically -->
+                                <tr class="border-b border-gray-700">
+                                    <td class="py-3 px-4 font-medium">Monthly Savings</td>
+                                    <td class="py-3 px-4 text-center">₹8,000</td>
+                                    <td class="py-3 px-4 text-center">₹12,500</td>
+                                    <td class="py-3 px-4 text-center text-neon-green">+₹4,500</td>
+                                </tr>
+                                <tr class="border-b border-gray-700">
+                                    <td class="py-3 px-4 font-medium">Entertainment Spending</td>
+                                    <td class="py-3 px-4 text-center">₹6,000</td>
+                                    <td class="py-3 px-4 text-center">₹3,600</td>
+                                    <td class="py-3 px-4 text-center text-neon-green">-₹2,400</td>
+                                </tr>
+                                <tr class="border-b border-gray-700">
+                                    <td class="py-3 px-4 font-medium">Investment Allocation</td>
+                                    <td class="py-3 px-4 text-center">₹15,000</td>
+                                    <td class="py-3 px-4 text-center">₹19,500</td>
+                                    <td class="py-3 px-4 text-center text-neon-green">+₹4,500</td>
+                                </tr>
+                                <tr>
+                                    <td class="py-3 px-4 font-medium">Goal Timeline</td>
+                                    <td class="py-3 px-4 text-center">48 months</td>
+                                    <td class="py-3 px-4 text-center">36 months</td>
+                                    <td class="py-3 px-4 text-center text-neon-green">-12 months</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex justify-center space-x-6">
+                    <button 
+                        onclick="downloadReport()" 
+                        class="px-8 py-4 bg-gradient-to-r from-neon-green to-cosmic-500 rounded-lg font-semibold hover:from-neon-green/80 hover:to-cosmic-400 transition-all duration-300 transform hover:scale-105"
+                    >
+                        <i class="fas fa-download mr-3"></i>
+                        Download Mission Report (PDF)
+                    </button>
+                    <button 
+                        onclick="startNewMission()" 
+                        class="px-8 py-4 glass-effect rounded-lg font-semibold hover:neon-border transition-all duration-300"
+                    >
+                        <i class="fas fa-redo mr-3"></i>
+                        New Mission
+                    </button>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        // Global variables
+        let currentQuestion = 0;
+        let questionData = {};
+        
+        // Question structure based on requirements
+        const questions = [
+            {
+                title: "Salary & Income",
+                fields: [
+                    { type: "number", label: "Monthly Income", id: "monthly_income", placeholder: "₹50,000" },
+                    { type: "radio", label: "Side Income?", id: "side_income", options: ["Yes", "No"] },
+                    { type: "number", label: "Side Income Amount", id: "side_income_amount", placeholder: "₹10,000", condition: "side_income=Yes" },
+                    { type: "select", label: "Bonuses/Variable Pay?", id: "bonus_pay", options: ["Yes", "No", "Sometimes"] }
+                ]
+            },
+            {
+                title: "Living Situation & Rent",
+                fields: [
+                    { type: "radio", label: "Housing Status", id: "housing_status", options: ["Rent", "Own", "Living with family"] },
+                    { type: "number", label: "Monthly Housing Expenses", id: "housing_expenses", placeholder: "₹15,000" },
+                    { type: "range", label: "Utility Bills (Monthly)", id: "utility_bills", min: 0, max: 10000, step: 500 },
+                    { type: "number", label: "People in Home", id: "household_size", placeholder: "3" }
+                ]
+            },
+            {
+                title: "Food & Dining",
+                fields: [
+                    { type: "number", label: "Weekly Groceries", id: "groceries_weekly", placeholder: "₹2,000" },
+                    { type: "number", label: "Monthly Dining Out", id: "dining_monthly", placeholder: "₹3,000" },
+                    { type: "select", label: "Food Ordering Frequency", id: "food_ordering", options: ["Daily", "Few times a week", "Rarely"] }
+                ]
+            },
+            {
+                title: "Shopping Habits",
+                fields: [
+                    { type: "number", label: "Monthly Clothing & Personal Care", id: "shopping_monthly", placeholder: "₹2,500" },
+                    { type: "range", label: "Impulse Shopping (1-5)", id: "impulse_shopping", min: 1, max: 5, step: 1 },
+                    { type: "select", label: "Online Shopping Frequency", id: "online_shopping", options: ["Daily", "Weekly", "Monthly", "Rarely"] }
+                ]
+            },
+            {
+                title: "Subscriptions & Entertainment",
+                fields: [
+                    { type: "checkbox", label: "Active Subscriptions", id: "subscriptions", options: ["Netflix", "Spotify", "Gym", "Amazon Prime", "Other OTT"] },
+                    { type: "number", label: "Total Monthly Subscription Cost", id: "subscription_cost", placeholder: "₹1,500" },
+                    { type: "range", label: "Entertainment Hours/Week", id: "entertainment_hours", min: 0, max: 50, step: 5 }
+                ]
+            },
+            {
+                title: "Travel & Transportation",
+                fields: [
+                    { type: "number", label: "Daily Commute Cost", id: "commute_cost", placeholder: "₹200" },
+                    { type: "radio", label: "Transportation Mode", id: "transport_mode", options: ["Public Transport", "Own Vehicle", "Both"] },
+                    { type: "number", label: "Monthly Transport Expense", id: "transport_monthly", placeholder: "₹3,000" }
+                ]
+            },
+            {
+                title: "Debt / Loans",
+                fields: [
+                    { type: "radio", label: "Do you have loans/EMIs?", id: "has_loans", options: ["Yes", "No"] },
+                    { type: "number", label: "Monthly Repayment", id: "loan_repayment", placeholder: "₹8,000", condition: "has_loans=Yes" },
+                    { type: "select", label: "Loan Type", id: "loan_type", options: ["Education", "Car", "Home", "Personal", "Credit Card"], condition: "has_loans=Yes" }
+                ]
+            },
+            {
+                title: "Investments & Financial Goals",
+                fields: [
+                    { type: "checkbox", label: "Investment Types", id: "investment_types", options: ["Fixed Deposits", "Stocks", "Mutual Funds", "Crypto", "Gold"] },
+                    { type: "number", label: "Monthly Investment Amount", id: "monthly_investment", placeholder: "₹5,000" },
+                    { type: "textarea", label: "Long-term Financial Goals", id: "financial_goals", placeholder: "House purchase, retirement planning..." }
+                ]
+            },
+            {
+                title: "Budgeting Behavior & Mindset",
+                fields: [
+                    { type: "radio", label: "Do you track spending?", id: "track_spending", options: ["Yes", "No"] },
+                    { type: "range", label: "Impulse Control (1-5)", id: "impulse_control", min: 1, max: 5, step: 1 },
+                    { type: "range", label: "Saving Behavior (1-10)", id: "saving_behavior", min: 1, max: 10, step: 1 },
+                    { type: "radio", label: "Financial Risk Taking", id: "risk_taking", options: ["Low", "Medium", "High"] }
+                ]
+            },
+            {
+                title: "Commitment & Willingness",
+                fields: [
+                    { type: "range", label: "Willingness to reduce expenses (1-10)", id: "expense_reduction", min: 1, max: 10, step: 1 },
+                    { type: "number", label: "Preferred Monthly Savings", id: "preferred_savings", placeholder: "₹10,000" },
+                    { type: "range", label: "Financial Discipline Level (1-5)", id: "financial_discipline", min: 1, max: 5, step: 1 }
+                ]
+            }
+        ];
+
+        // Navigation functions
+        function startMission() {
+            document.getElementById('homepage').classList.add('hidden');
+            document.getElementById('questionnaire').classList.remove('hidden');
+            loadQuestion(0);
+        }
+
+        function loadQuestion(index) {
+            const question = questions[index];
+            const container = document.getElementById('question-container');
+            
+            let html = `
+                <h3 class="font-orbitron text-2xl font-bold mb-6 text-neon-cyan">
+                    <i class="fas fa-satellite-dish mr-3"></i>
+                    ${question.title}
+                </h3>
+                <div class="space-y-6">
+            `;
+            
+            question.fields.forEach(field => {
+                html += createFieldHTML(field);
+            });
+            
+            html += '</div>';
+            container.innerHTML = html;
+            
+            // Update progress
+            const progress = ((index + 1) / questions.length) * 100;
+            document.getElementById('progress-bar').style.width = `${progress}%`;
+            document.getElementById('progress-text').textContent = `Step ${index + 1} of ${questions.length}`;
+            
+            // Update navigation buttons
+            document.getElementById('prev-btn').disabled = index === 0;
+            document.getElementById('next-btn').textContent = index === questions.length - 1 ? 'Complete Mission' : 'Next';
+        }
+
+        function createFieldHTML(field) {
+            let html = `<div class="space-y-2">`;
+            
+            if (field.condition) {
+                html += `<div data-condition="${field.condition}">`;
+            }
+            
+            html += `<label class="block text-sm font-medium text-gray-300">${field.label}</label>`;
+            
+            switch (field.type) {
+                case 'number':
+                    html += `<input type="number" id="${field.id}" placeholder="${field.placeholder}" 
+                             class="w-full p-3 bg-gray-800/50 border border-gray-600 rounded-lg focus:border-neon-cyan focus:ring-1 focus:ring-neon-cyan transition-all duration-300">`;
+                    break;
+                    
+                case 'text':
+                    html += `<input type="text" id="${field.id}" placeholder="${field.placeholder}" 
+                             class="w-full p-3 bg-gray-800/50 border border-gray-600 rounded-lg focus:border-neon-cyan focus:ring-1 focus:ring-neon-cyan transition-all duration-300">`;
+                    break;
+                    
+                case 'textarea':
+                    html += `<textarea id="${field.id}" placeholder="${field.placeholder}" rows="3"
+                             class="w-full p-3 bg-gray-800/50 border border-gray-600 rounded-lg focus:border-neon-cyan focus:ring-1 focus:ring-neon-cyan transition-all duration-300"></textarea>`;
+                    break;
+                    
+                case 'radio':
+                    html += '<div class="flex space-x-4">';
+                    field.options.forEach(option => {
+                        html += `
+                            <label class="flex items-center space-x-2 cursor-pointer">
+                                <input type="radio" name="${field.id}" value="${option}" 
+                                       class="w-4 h-4 text-neon-cyan bg-gray-800 border-gray-600 focus:ring-neon-cyan">
+                                <span class="text-gray-300">${option}</span>
+                            </label>
+                        `;
+                    });
+                    html += '</div>';
+                    break;
+                    
+                case 'checkbox':
+                    html += '<div class="grid grid-cols-2 gap-3">';
+                    field.options.forEach(option => {
+                        html += `
+                            <label class="flex items-center space-x-2 cursor-pointer">
+                                <input type="checkbox" name="${field.id}" value="${option}" 
+                                       class="w-4 h-4 text-neon-cyan bg-gray-800 border-gray-600 focus:ring-neon-cyan">
+                                <span class="text-gray-300">${option}</span>
+                            </label>
+                        `;
+                    });
+                    html += '</div>';
+                    break;
+                    
+                case 'select':
+                    html += `<select id="${field.id}" 
+                             class="w-full p-3 bg-gray-800/50 border border-gray-600 rounded-lg focus:border-neon-cyan focus:ring-1 focus:ring-neon-cyan transition-all duration-300">
+                                <option value="">Select an option</option>`;
+                    field.options.forEach(option => {
+                        html += `<option value="${option}">${option}</option>`;
+                    });
+                    html += '</select>';
+                    break;
+                    
+                case 'range':
+                    html += `
+                        <div class="space-y-2">
+                            <input type="range" id="${field.id}" min="${field.min}" max="${field.max}" step="${field.step}" 
+                                   class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider">
+                            <div class="flex justify-between text-xs text-gray-400">
+                                <span>${field.min}</span>
+                                <span id="${field.id}_value">${field.min}</span>
+                                <span>${field.max}</span>
+                            </div>
+                        </div>
+                    `;
+                    break;
+            }
+            
+            if (field.condition) {
+                html += '</div>';
+            }
+            
+            html += '</div>';
+            return html;
+        }
+
+        function nextQuestion() {
+            // TODO: Collect and validate current question data
+            if (currentQuestion < questions.length - 1) {
+                currentQuestion++;
+                loadQuestion(currentQuestion);
+            } else {
+                // Complete questionnaire and show dashboard
+                completeMission();
+            }
+        }
+
+        function previousQuestion() {
+            if (currentQuestion > 0) {
+                currentQuestion--;
+                loadQuestion(currentQuestion);
+            }
+        }
+
+        function completeMission() {
+            document.getElementById('questionnaire').classList.add('hidden');
+            document.getElementById('dashboard').classList.remove('hidden');
+            generateDashboard();
+        }
+
+        function generateDashboard() {
+            // Initialize all charts
+            initializeCharts();
+            
+            // Set up simulators
+            setupSimulators();
+            
+            // TODO: Process questionnaire data with Gemini API for AI insights
+        }
+
+        function initializeCharts() {
+            // Overall Spending Chart
+            const ctx1 = document.getElementById('overallSpendingChart').getContext('2d');
+            new Chart(ctx1, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Housing', 'Food', 'Transportation', 'Entertainment', 'Shopping', 'Investments'],
+                    datasets: [{
+                        data: [35, 20, 15, 12, 8, 10],
+                        backgroundColor: [
+                            '#00F5FF',
+                            '#6B46C1',
+                            '#D946EF',
+                            '#10B981',
+                            '#F59E0B',
+                            '#EF4444'
+                        ],
+                        borderWidth: 3,
+                        borderColor: '#1A1A3A'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: { color: '#E2E8F0' }
+                        }
+                    }
+                }
+            });
+
+            // Need vs Want Chart
+            const ctx2 = document.getElementById('needWantChart').getContext('2d');
+            new Chart(ctx2, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Needs', 'Wants'],
+                    datasets: [{
+                        data: [68, 32],
+                        backgroundColor: ['#10B981', '#EF4444'],
+                        borderWidth: 3,
+                        borderColor: '#1A1A3A'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: { color: '#E2E8F0' }
+                        }
+                    }
+                }
+            });
+
+            // Needs Chart
+            const ctx3 = document.getElementById('needsChart').getContext('2d');
+            new Chart(ctx3, {
+                type: 'pie',
+                data: {
+                    labels: ['Housing', 'Food', 'Transportation', 'Utilities'],
+                    datasets: [{
+                        data: [45, 25, 20, 10],
+                        backgroundColor: ['#00F5FF', '#06D6A0', '#10B981', '#059669']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: { legend: { labels: { color: '#E2E8F0' } } }
+                }
+            });
+
+            // Wants Chart
+            const ctx4 = document.getElementById('wantsChart').getContext('2d');
+            new Chart(ctx4, {
+                type: 'pie',
+                data: {
+                    labels: ['Entertainment', 'Shopping', 'Dining', 'Subscriptions'],
+                    datasets: [{
+                        data: [40, 30, 20, 10],
+                        backgroundColor: ['#D946EF', '#F59E0B', '#EF4444', '#8B5CF6']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: { legend: { labels: { color: '#E2E8F0' } } }
+                }
+            });
+
+            // Cash Flow Chart
+            const ctx5 = document.getElementById('cashFlowChart').getContext('2d');
+            new Chart(ctx5, {
+                type: 'bar',
+                data: {
+                    labels: ['Income', 'Expenses', 'Investments', 'Savings'],
+                    datasets: [{
+                        data: [50000, 35000, 10000, 5000],
+                        backgroundColor: ['#10B981', '#EF4444', '#D946EF', '#00F5FF']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: { 
+                            beginAtZero: true,
+                            ticks: { color: '#E2E8F0' }
+                        },
+                        x: { 
+                            ticks: { color: '#E2E8F0' }
+                        }
+                    },
+                    plugins: { legend: { display: false } }
+                }
+            });
+
+            // Goal Timeline Chart
+            const ctx6 = document.getElementById('goalTimelineChart').getContext('2d');
+            new Chart(ctx6, {
+                type: 'line',
+                data: {
+                    labels: ['Year 1', 'Year 2', 'Year 3', 'Year 4', 'Year 5'],
+                    datasets: [{
+                        label: 'Investment Growth',
+                        data: [120000, 280000, 480000, 720000, 1000000],
+                        borderColor: '#00F5FF',
+                        backgroundColor: 'rgba(0, 245, 255, 0.1)',
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: { 
+                            beginAtZero: true,
+                            ticks: { color: '#E2E8F0' }
+                        },
+                        x: { 
+                            ticks: { color: '#E2E8F0' }
+                        }
+                    },
+                    plugins: {
+                        legend: { labels: { color: '#E2E8F0' } }
+                    }
+                }
+            });
+        }
+
+        function setupSimulators() {
+            // Savings slider
+            const savingsSlider = document.getElementById('savings-slider');
+            const savingsValue = document.getElementById('savings-value');
+            
+            savingsSlider.addEventListener('input', function() {
+                savingsValue.textContent = this.value + '%';
+                updateSimulationResults();
+            });
+
+            // Entertainment slider
+            const entertainmentSlider = document.getElementById('entertainment-slider');
+            const entertainmentValue = document.getElementById('entertainment-value');
+            
+            entertainmentSlider.addEventListener('input', function() {
+                entertainmentValue.textContent = this.value + '%';
+                updateSimulationResults();
+            });
+        }
+
+        function updateSimulationResults() {
+            const savingsChange = document.getElementById('savings-slider').value;
+            const entertainmentReduction = document.getElementById('entertainment-slider').value;
+            
+            // Calculate impacts (mock calculations)
+            const baseSavings = 8000;
+            const savingsImpact = Math.round(baseSavings * (savingsChange / 100));
+            const entertainmentSavings = Math.round(6000 * (entertainmentReduction / 100));
+            
+            const totalImpact = savingsImpact + entertainmentSavings;
+            const newTimeline = Math.max(12, 36 - Math.round(totalImpact / 1000));
+            const investmentGrowth = Math.round(totalImpact * 12 * 1.08);
+            
+            document.getElementById('savings-impact').textContent = `+₹${totalImpact.toLocaleString()}`;
+            document.getElementById('goal-timeline').textContent = `${newTimeline} months`;
+            document.getElementById('investment-growth').textContent = `₹${investmentGrowth.toLocaleString()}`;
+        }
+
+        function downloadReport() {
+            // TODO: Generate and download PDF report
+            alert('PDF report generation would be implemented here using libraries like jsPDF');
+        }
+
+        function startNewMission() {
+            currentQuestion = 0;
+            questionData = {};
+            document.getElementById('dashboard').classList.add('hidden');
+            document.getElementById('homepage').classList.remove('hidden');
+        }
+
+        // Add range slider value updates
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add event listeners for range sliders when they're created
+            document.addEventListener('input', function(e) {
+                if (e.target.type === 'range' && e.target.id.endsWith('_value') === false) {
+                    const valueDisplay = document.getElementById(e.target.id + '_value');
+                    if (valueDisplay) {
+                        valueDisplay.textContent = e.target.value;
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>

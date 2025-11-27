@@ -47,9 +47,9 @@ const HomePage: React.FC<HomePageProps> = ({ onStartMission }) => {
   ];
 
   const stats = [
-    { value: "10M+", label: "Financial Insights Generated", icon: Brain },
+    { value: "60 seconds", label: "Financial Insights Generated", icon: Brain },
     { value: "95%", label: "Accuracy in Predictions", icon: TrendingUp },
-    { value: "50K+", label: "Users Trust Us", icon: Shield },
+    { value: "100%", label: "Privacy & Security", icon: Shield },
     { value: "24/7", label: "AI Monitoring", icon: Zap }
   ];
 
